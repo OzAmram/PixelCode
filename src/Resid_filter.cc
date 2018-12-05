@@ -22,6 +22,7 @@ Resid_filter::Resid_filter(const edm::ParameterSet& iConfig// , edm::ConsumesCol
     pileupSummaryToken_ = consumes<std::vector<PileupSummaryInfo>>(edm::InputTag("addPileupInfo"));
     clustersToken_ = consumes<edmNew::DetSetVector<SiPixelCluster>>(edm::InputTag("siPixelClusters"));
     trackCollectionToken_ = consumes<reco::TrackCollection> (iConfig.getParameter<edm::InputTag>("trackInput"));
+    trackCollectionGeneralToken_ = consumes<reco::TrackCollection> (iConfig.getParameter<edm::InputTag>("trackInputGeneral"));
     measurementTrackerEventToken_ = consumes<MeasurementTrackerEvent> (edm::InputTag("MeasurementTrackerEvent"));
     pixelDigiCollectionToken_ = consumes<edm::DetSetVector<PixelDigi>> (edm::InputTag("simSiPixelDigis"));
     dropLayer=iConfig.getParameter<int>("dropLayer");
@@ -115,6 +116,92 @@ void Resid_filter::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 
 }
 
+bool Resid_filter::isClustInTrack(const SiPixelCluster *clust, reco::Track track){
+
+    if(clust == nullptr){
+        printf("Clust was null! \n");
+        return false;
+    }
+    int minPixelRow = clust->minPixelRow();
+    int maxPixelRow = clust->maxPixelRow();
+    int minPixelCol = clust->minPixelCol();
+    int maxPixelCol = clust->maxPixelCol();
+    // rechits from track
+    for( trackingRecHit_iterator irecHit = track.recHitsBegin();
+            irecHit != track.recHitsEnd(); ++irecHit ) {
+
+        DetId detId = (*irecHit)->geographicalId();
+        if(!Resid_filterHelpers::detidIsOnPixel(detId)){
+            //printf("rechit not on pixel \n");
+            continue;
+        }
+
+        const SiPixelCluster* clustTrk = nullptr;
+        const SiPixelRecHit *hitTrk = static_cast<const SiPixelRecHit*>((*irecHit) -> hit());
+        clustTrk = hitTrk -> cluster().get();
+
+        if(clust != nullptr && clustTrk!= nullptr){
+            if(  clustTrk->maxPixelRow()  == maxPixelRow &&
+                    clustTrk->minPixelRow()  == minPixelRow &&
+                    clustTrk->maxPixelCol()  == maxPixelCol &&
+                    clustTrk->maxPixelCol()  == minPixelCol ) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,const edm::Handle<reco::TrackCollection>& tracksGeneral) {
+    //  const reco::Track* pTrack = nullptr;
+
+    // general tracks
+    for( reco::TrackCollection::const_iterator iTrackGeneral = tracksGeneral->begin();
+            iTrackGeneral != tracksGeneral->end(); ++iTrackGeneral ) {
+
+
+        //we only use refit tracks with > 10 pt
+        if(iTrackGeneral->pt() < 10.) continue;
+        bool found_trk = true;
+        printf("lets check new track \n");
+
+        // check for which track all recthits from refitted track are on general track                                                  
+        // rechits from refitted track
+        for( trackingRecHit_iterator irecHit = iTrack.recHitsBegin();
+                irecHit != iTrack.recHitsEnd(); ++irecHit ) {
+
+            if(!(*irecHit)->isValid()) continue;
+            DetId detId = (*irecHit)->geographicalId();
+            if(!Resid_filterHelpers::detidIsOnPixel(detId)) {
+                //printf("rechit not on pixel \n");
+                continue;
+            }
+            
+            const SiPixelRecHit *hit = static_cast<const SiPixelRecHit*>((*irecHit)->hit());
+            const SiPixelCluster* clust = nullptr;
+            clust = hit -> cluster().get();
+            if(clust !=nullptr && !isClustInTrack(clust, *iTrackGeneral)){
+                printf("clust not in track, breaking \n");
+                found_trk = false;
+                break;
+
+            }
+            else{
+                printf("clust in track \n");
+            }
+
+
+
+        }// rechits from refitted track  
+
+        if(found_trk) return &(*iTrackGeneral);
+
+    } // general tracks
+    printf("couldn't associate track!! \n");
+
+    return nullptr;
+}
 // trajectory measurement: contains all info about measurement of a trajectory by a DetId(detector number)                                   
 // - tracking rechit                                                                                                                         
 // - predicted TrajectoryStateOnSurface (fitter and smoother)                                                                                
@@ -128,7 +215,8 @@ void Resid_filter::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 void Resid_filter::checkAndSaveTrajMeasurementData
 ( const TrajectoryMeasurement& measurement,
   const edm::Handle<edmNew::DetSetVector<SiPixelCluster>>& clusterCollectionHandle,
-  edm::OwnVector<TrackingRecHit> &layeri_hits
+  const reco::Track iTrack,
+  const edm::Handle<reco::TrackCollection>& iGeneralTracks
   ) {
 
     // Check if the measurement infos can be read                                                                                              
@@ -226,6 +314,15 @@ void Resid_filter::checkAndSaveTrajMeasurementData
         found2ndClust = false;
     }
 
+
+    auto genAssocTrack = associateInputTrack(iTrack,iGeneralTracks);
+    if(genAssocTrack != nullptr){
+        onTrack = isClustInTrack(clust, *genAssocTrack);
+    }
+    else{
+        onTrack = false;
+    }
+    printf("isOnTrack = %i \n", (int) onTrack);
 
 
 
@@ -537,6 +634,14 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         printf("Couldn't get tracks!\n");
         return;
     }
+    //
+    // general tracks: (not dropping layer)
+    Handle<reco::TrackCollection> tGeneralTracks;
+    iEvent.getByToken( trackCollectionGeneralToken_, tGeneralTracks );
+    if( tGeneralTracks.failedToGet() || !tGeneralTracks.isValid() ){
+      printf("Couldn't get general tracks!\n");
+      return;
+    }
 
 
     //----------------------------------------------------------------------------
@@ -680,7 +785,7 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
                 //CRIS's FUNCTION GOES HERE!
                 // should pass tree? find out where to end loop
-                checkAndSaveTrajMeasurementData(layerTrajectoryMeasurements.front(), clusterCollectionHandle, layeri_hits);
+                checkAndSaveTrajMeasurementData(layerTrajectoryMeasurements.front(), clusterCollectionHandle, *iTrack, tGeneralTracks) ;
 
             }//refitted trajectory
             else{
