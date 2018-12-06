@@ -153,6 +153,39 @@ bool Resid_filter::isClustInTrack(const SiPixelCluster *clust, reco::Track track
     return false;
 }
 
+bool Resid_filter::isStripClustInTrack(const SiStripCluster *clust, reco::Track track){
+
+    if(clust == nullptr){
+        printf("Strip Clust was null! \n");
+        return false;
+    }
+    unsigned int clustsize = clust->amplitudes().size();
+    int first  = clust->firstStrip();     
+    // rechits from track
+    for( trackingRecHit_iterator irecHit = track.recHitsBegin();
+            irecHit != track.recHitsEnd(); ++irecHit ) {
+
+        DetId detId = (*irecHit)->geographicalId();
+        if(!Resid_filterHelpers::detidIsOnPixel(detId)){
+            //printf("rechit not on pixel \n");
+            continue;
+        }
+
+        const SiStripCluster* clustTrk = nullptr;
+        if(const SiStripRecHit2D * hitTrk = dynamic_cast<const SiStripRecHit2D *>((*irecHit) ->hit()))
+            clustTrk = &(*hitTrk -> cluster());
+
+        if(clust != nullptr && clustTrk!= nullptr){
+            if(clustsize == clustTrk->amplitudes().size() &&
+               first == clust->firstStrip())
+                return true;
+            }
+        }
+    
+
+    return false;
+}
+
 const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,const edm::Handle<reco::TrackCollection>& tracksGeneral) {
     //  const reco::Track* pTrack = nullptr;
 
@@ -162,7 +195,7 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
 
         //we only use refit tracks with > 10 pt
-        if(iTrackGeneral->pt() < 10.) continue;
+        if(iTrackGeneral->pt() < 9.) continue;
         bool found_trk = true;
         printf("lets check new track \n");
 
@@ -173,23 +206,61 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
             if(!(*irecHit)->isValid()) continue;
             DetId detId = (*irecHit)->geographicalId();
-            if(!Resid_filterHelpers::detidIsOnPixel(detId)) {
-                //printf("rechit not on pixel \n");
-                continue;
+            if(Resid_filterHelpers::detidIsOnPixel(detId)) {
+                const SiPixelRecHit *hit = static_cast<const SiPixelRecHit*>((*irecHit)->hit());
+                const SiPixelCluster* clust = nullptr;
+                clust = hit -> cluster().get();
+                if(clust !=nullptr && !isClustInTrack(clust, *iTrackGeneral)){
+                    printf("clust not in track, breaking \n");
+                    found_trk = false;
+                    break;
+
+                }
+                else{
+                    printf("clust in track \n");
+                }
+            }
+            else if(Resid_filterHelpers::detidIsOnStrips(detId)) {
+                const SiStripCluster* clust = nullptr;
+
+                if(const SiStripRecHit2D * rechit = 
+                        dynamic_cast<const SiStripRecHit2D *>((*irecHit)->hit()))
+                {   
+                    printf("Strip type 1 \n");
+                    clust = &(*rechit -> cluster());
+                }
+                //check if it is a matched SiStripMatchedRecHit2D
+                else  if(const SiStripRecHit1D * rechit = 
+                        dynamic_cast<const SiStripRecHit1D *>((*irecHit)->hit()))
+                {   
+                    printf("Strip type 2 \n");
+                    clust = &(*rechit -> cluster());
+                }
+                //check if it is a matched SiStripMatchedRecHit2D
+                else  if(const SiStripMatchedRecHit2D * rechit = 
+                        dynamic_cast<const SiStripMatchedRecHit2D *>((*irecHit)->hit()))
+                {   
+                    printf("Strip type 3 \n");
+                    continue;
+                }
+                //check if it is a  ProjectedSiStripRecHit2D
+                else if(const ProjectedSiStripRecHit2D * rechit = 
+                        dynamic_cast<const ProjectedSiStripRecHit2D *>((*irecHit)->hit())) {
+                    printf("Strip type 4 \n");
+                    continue;
+                }
+
+                if(clust !=nullptr && !isStripClustInTrack(clust, *iTrackGeneral)){
+                    printf("strip clust not in track, breaking \n");
+                    found_trk = false;
+                    break;
+
+                }
+                else{
+                    printf("strip clust in track \n");
+                }
             }
             
-            const SiPixelRecHit *hit = static_cast<const SiPixelRecHit*>((*irecHit)->hit());
-            const SiPixelCluster* clust = nullptr;
-            clust = hit -> cluster().get();
-            if(clust !=nullptr && !isClustInTrack(clust, *iTrackGeneral)){
-                printf("clust not in track, breaking \n");
-                found_trk = false;
-                break;
-
-            }
-            else{
-                printf("clust in track \n");
-            }
 
 
 
@@ -919,6 +990,7 @@ void Resid_filter::endJob() {
 
 }
 
+
 namespace Resid_filterHelpers
 {
 
@@ -931,6 +1003,14 @@ namespace Resid_filterHelpers
         if (detid.subdetId() == PixelSubdetector::PixelEndcap) return true;
         return false;
     }
+    bool detidIsOnStrips(const DetId &detid){
+        if (detid.det()!=DetId::Tracker) return false;
+        unsigned int subdetId = detid.subdetId();
+        if (subdetId==SiStripDetId::TIB||subdetId==SiStripDetId::TOB
+                || subdetId==SiStripDetId::TID||subdetId==SiStripDetId::TEC) return true;
+        return false;
+    }
+
 
     TrajectoryStateOnSurface getTrajectoryStateOnSurface(const TrajectoryMeasurement& measurement) {
 

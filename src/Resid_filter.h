@@ -32,6 +32,10 @@
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
 #include "DataFormats/SiPixelRawData/interface/SiPixelRawDataError.h"
 #include "DataFormats/TrackerRecHit2D/interface/SiPixelRecHit.h"
+#include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit2D.h"
+#include "DataFormats/TrackerRecHit2D/interface/SiStripRecHit1D.h"
+#include "DataFormats/TrackerRecHit2D/interface/SiStripMatchedRecHit2D.h"
+#include "DataFormats/TrackerRecHit2D/interface/ProjectedSiStripRecHit2D.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -316,6 +320,7 @@ private:
 			const edm::Handle<edmNew::DetSetVector<SiPixelCluster>>&,
 			const edm::Handle<TrajTrackAssociationCollection>&);
 
+bool isStripClustInTrack(const SiStripCluster *clust, reco::Track track);
   bool isClustInTrack(const SiPixelCluster *hit, const reco::Track track);
   const reco::Track* associateInputTrack(const reco::Track iTrack, const edm::Handle<reco::TrackCollection>& tracksGeneral);
 
@@ -396,6 +401,7 @@ namespace Resid_filterHelpers
 
 
   bool detidIsOnPixel(const DetId&);
+  bool detidIsOnStrips(const DetId&);
 
   bool areIdenticalModules(const ModuleData&, const ModuleData&);
 
