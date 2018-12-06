@@ -282,7 +282,7 @@ private:
     Int_t clust2xmax, clust2xmin, clust2ymin, clust2ymax, clust2SizeY, clust2SizeX;
     float probQ1D, probQ2D, probXY1D, probXY2D;
     int qBin1D, qBin2D;
-    bool onTrack;
+    bool onTrack, assocTrack;
     bool hasBadPixels1D, isOnEdge1D, hasFilledProb1D;
     bool hasBadPixels2D, isOnEdge2D, hasFilledProb2D;
     bool found2ndClust;
@@ -320,7 +320,7 @@ private:
 			const edm::Handle<edmNew::DetSetVector<SiPixelCluster>>&,
 			const edm::Handle<TrajTrackAssociationCollection>&);
 
-bool isStripClustInTrack(const SiStripCluster *clust, reco::Track track);
+  bool isStripClustInTrack(const SiStripCluster *clust, reco::Track track,int clusttype);
   bool isClustInTrack(const SiPixelCluster *hit, const reco::Track track);
   const reco::Track* associateInputTrack(const reco::Track iTrack, const edm::Handle<reco::TrackCollection>& tracksGeneral);
 
