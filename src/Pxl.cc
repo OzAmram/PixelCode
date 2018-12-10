@@ -152,7 +152,7 @@ class Pixel : public edm::EDAnalyzer{
         Double_t trkEta, trkPt;
         Int_t layer1EdgeTypeY, layer2EdgeTypeY, layer3EdgeTypeY, layer4EdgeTypeY;
         Int_t layer1EdgeTypeX, layer2EdgeTypeX, layer3EdgeTypeX, layer4EdgeTypeX;
-        bool layer1Used2D, layer2Used2D, layer3Used2D, layer4Used2D;
+        bool layer1HasBadPixels, layer2HasBadPixels, layer3HasBadPixels, layer4HasBadPixels;
         bool layer1OnEdge, layer2OnEdge, layer3OnEdge, layer4OnEdge;
         Int_t pxn1, pxn2, pxn3, pxn4;
         Int_t layer1xmax, layer1xmin, layer1ymin, layer1ymax, layer1SizeY, layer1SizeX;
@@ -211,22 +211,14 @@ Pixel::Pixel(const edm::ParameterSet& iConfig// , edm::ConsumesCollector && ic
     tree->Branch("pxn4", &pxn4);
     tree->Branch("trkEta", &trkEta);
     tree->Branch("trkPt", &trkPt);
-    tree->Branch("layer1EdgeTypeY", &layer1EdgeTypeY);
-    tree->Branch("layer2EdgeTypeY", &layer2EdgeTypeY);
-    tree->Branch("layer3EdgeTypeY", &layer3EdgeTypeY);
-    tree->Branch("layer4EdgeTypeY", &layer4EdgeTypeY);
-    tree->Branch("layer1EdgeTypeX", &layer1EdgeTypeX);
-    tree->Branch("layer2EdgeTypeX", &layer2EdgeTypeX);
-    tree->Branch("layer3EdgeTypeX", &layer3EdgeTypeX);
-    tree->Branch("layer4EdgeTypeX", &layer4EdgeTypeX);
     tree->Branch("layer1OnEdge", &layer1OnEdge);
     tree->Branch("layer2OnEdge", &layer2OnEdge);
     tree->Branch("layer3OnEdge", &layer3OnEdge);
     tree->Branch("layer4OnEdge", &layer4OnEdge);
-    tree->Branch("layer1Used2D", &layer1Used2D);
-    tree->Branch("layer2Used2D", &layer2Used2D);
-    tree->Branch("layer3Used2D", &layer3Used2D);
-    tree->Branch("layer4Used2D", &layer4Used2D);
+    tree->Branch("layer1HasBadPixels", &layer1HasBadPixels);
+    tree->Branch("layer2HasBadPixels", &layer2HasBadPixels);
+    tree->Branch("layer3HasBadPixels", &layer3HasBadPixels);
+    tree->Branch("layer4HasBadPixels", &layer4HasBadPixels);
 
     tree->Branch("layer1SizeX", &layer1SizeX);
     tree->Branch("layer1SizeY", &layer1SizeY);
@@ -974,9 +966,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         edm::Ref<edmNew::DetSetVector<SiPixelCluster>, SiPixelCluster> const & clust = pixhit->cluster();
 
                         if(ilay == 1){
-                            //layer1EdgeTypeY = pixhit->edgeTypeY_;
-                            //layer1EdgeTypeX = pixhit->edgeTypeX_;
-                            //layer1Used2D = pixhit->filled_from_2d;
+                            layer1HasBadPixels = pixhit->hasBadPixels();
                             layer1OnEdge = pixhit->isOnEdge();
                             layer1Charge = clust->charge();
                             layer1SizeX = clust->sizeX();
@@ -987,9 +977,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                             layer1ymax = clust->maxPixelCol();
                         }
                         else if(ilay ==2){
-                            //layer2EdgeTypeY = pixhit->edgeTypeY_;
-                            //layer2EdgeTypeX = pixhit->edgeTypeX_;
-                            //layer2Used2D = pixhit->filled_from_2d;
+                            layer2HasBadPixels = pixhit->hasBadPixels();
                             layer2OnEdge = pixhit->isOnEdge();
                             layer2Charge = clust->charge();
                             layer2SizeX = clust->sizeX();
@@ -1000,9 +988,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                             layer2ymax = clust->maxPixelCol();
                         }
                         else if(ilay ==3){
-                            //layer3EdgeTypeY = pixhit->edgeTypeY_;
-                            //layer3EdgeTypeX = pixhit->edgeTypeX_;
-                            //layer3Used2D = pixhit->filled_from_2d;
+                            layer3HasBadPixels = pixhit->hasBadPixels();
                             layer3OnEdge = pixhit->isOnEdge();
                             layer3Charge = clust->charge();
                             layer3SizeX = clust->sizeX();
@@ -1013,9 +999,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                             layer3ymax = clust->maxPixelCol();
                         }
                         else if(ilay ==4){
-                            //layer4EdgeTypeY = pixhit->edgeTypeY_;
-                            //layer4EdgeTypeX = pixhit->edgeTypeX_;
-                            //layer4Used2D = pixhit->filled_from_2d;
+                            layer4HasBadPixels = pixhit->hasBadPixels();
                             layer4OnEdge = pixhit->isOnEdge();
                             layer4Charge = clust->charge();
                             layer4SizeX = clust->sizeX();

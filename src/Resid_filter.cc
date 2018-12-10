@@ -225,7 +225,7 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
 
         //we only use refit tracks with > 10 pt
-        if(iTrackGeneral->pt() < 9.) continue;
+        if(iTrackGeneral->pt() < 8.) continue;
         bool found_trk = true;
         //printf("lets check new track \n");
 
@@ -289,13 +289,13 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
 		// find track associated with clust
                 if(clust !=nullptr && !isStripClustInTrack(clust, *iTrackGeneral, clusttype)){
-                    //printf("strip clust not in track, breaking \n");
+                    printf("strip clust not in track, breaking \n");
                     found_trk = false;
                     break;
 
                 }
                 else{
-                    //printf("strip clust in track \n");
+                    printf("strip clust in track \n");
                 }
             }
             
@@ -968,9 +968,8 @@ std::vector<TrajectoryMeasurement> Resid_filter::getLayerIntercept (std::vector<
     // std::cout << "Searching for the first layer trajectory measurements... ";
     // Not for the faint hearted ...
     int layToFind;
-    //if(ilay ==1) layToFind =2;
-    //else layToFind = ilay-1;
-    layToFind = ilay+1;
+    if(ilay ==4) layToFind =3;
+    else layToFind = ilay+1;
     auto firstLayerTrajMeasurementIt = 
         std::find_if(trajectoryMeasurements.begin(), 
                 trajectoryMeasurements.end(),
