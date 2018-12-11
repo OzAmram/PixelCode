@@ -1445,16 +1445,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                     double xHit = iTM->recHit()->localPosition().x(); // primary measurement direction
                     double yHit = iTM->recHit()->localPosition().y(); // always 0 in strips
-                    /*
-                       int ilay = 0;
-                       if( detId.subdetId() == 1 ){
-                       ilay = PXBDetId( detId ).layer();
-                       }
-
-                       if( subDet == 1 && idbg ){//1=PXB
-                       cout << "  PXB layer " << ilay << endl;
-                       }
-                       */
 
                     double dx = xHit - iTM->predictedState().localPosition().x();
                     double dy = yHit - iTM->predictedState().localPosition().y();
