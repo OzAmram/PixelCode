@@ -282,6 +282,7 @@ private:
     Int_t clust2xmax, clust2xmin, clust2ymin, clust2ymax, clust2SizeY, clust2SizeX;
     float probQ1D, probQ2D, probXY1D, probXY2D;
     int qBin1D, qBin2D;
+    int numLayers;
     bool onTrack, assocTrack;
     bool hasBadPixels1D, isOnEdge1D, hasFilledProb1D;
     bool hasBadPixels2D, isOnEdge2D, hasFilledProb2D;

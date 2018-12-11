@@ -47,6 +47,7 @@ Resid_filter::Resid_filter(const edm::ParameterSet& iConfig// , edm::ConsumesCol
     tree->Branch("err2Dy", &err2Dy);
     tree->Branch("trkEta", &trkEta);
     tree->Branch("trkPt", &trkPt);
+    tree->Branch("numLayers", &numLayers);
 
     tree->Branch("clustSizeX", &clustSizeX);
     tree->Branch("clustSizeY", &clustSizeY);
@@ -794,6 +795,13 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
         if( iTrack->extra().isNull() ) continue;//next track
         if( ! iTrack->extra().isAvailable() ) continue;//next track
+        const reco::HitPattern& hp = iTrack->hitPattern();
+        numLayers = hp.trackerLayersWithMeasurement();
+        if(  numLayers < 6 ){
+            printf("track only has %i layers, skipping \n", numLayers);
+            continue; // select only tracks which go into the strips
+        }
+
         //Test track association
 	    //auto genAssocTrack = associateInputTrack(*iTrack,tGeneralTracks);
         //if(genAssocTrack !=nullptr) printf("\n\n Associated track =) \n");

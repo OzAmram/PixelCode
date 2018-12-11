@@ -106,9 +106,9 @@ process.RECOoutput_step = cms.EndPath(process.RECOoutput)
 process.load("RecoTracker.FinalTrackSelectors.TrackerTrackHitFilter_cff")
 process.TrackerTrackHitFilter.src = 'generalTracks'
 #process.TrackerTrackHitFilter.commands = cms.vstring("drop PXB","keep PXB 2","keep PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
-#process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","drop PXB 2","keep PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","drop PXB 2","keep PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
 #process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","keep PXB 2","drop PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
-process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","keep PXB 2","keep PXB 3","drop PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+#process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","keep PXB 2","keep PXB 3","drop PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
 #Might want to customize other options of the tracker track hit filter
 #Refit tracks after hit filter
 #You might want to customize the options, or use a different refitter
@@ -130,7 +130,7 @@ process.Layer1_Residuals = cms.EDAnalyzer('Resid_filter',
         ttrhBuilder = cms.string('WithAngleAndTemplate'),
         trackInput = cms.InputTag('trackFitter'),
         trackInputGeneral = cms.InputTag('generalTracks'),
-        dropLayer = cms.int32(4)
+        dropLayer = cms.int32(2)
 )
 
 # TFileService used for both BPix/FPix resolution
