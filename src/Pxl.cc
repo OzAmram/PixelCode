@@ -1191,22 +1191,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         // zloc = preciseHit->localPosition().z();// up, always zero
 
                         vxloc = preciseHit->localPositionError().xx();//covariance
-                        //vyloc = preciseHit->localPositionError().yy();//covariance
+                        vyloc = preciseHit->localPositionError().yy();//covariance
 
-                        if( idbg && subDet==1 ) {
-                            cout << "  improved hit in lay " << tTopo->pxbLayer(detId);//PXBDetId(detId).layer();
-                            cout << setprecision(4);
-                            cout << ", xloc from " << transRecHit->localPosition().x();
-                            cout << " to " << preciseHit->localPosition().x();
-                            cout << ", yloc from " << transRecHit->localPosition().y();
-                            cout << " to " << preciseHit->localPosition().y();
-                            cout << endl;
-                            cout<<sqrt(transRecHit->localPositionError().xx())*1E4<<" ";
-                            cout<<sqrt(transRecHit->localPositionError().yy())*1E4<<" ";
-                            cout<<sqrt(preciseHit->localPositionError().xx())*1E4<<" ";
-                            cout<<sqrt(preciseHit->localPositionError().yy())*1E4<<" ";
-                            cout << endl;
-                        }
 
                         gX = preciseHit->globalPosition().x();
                         gY = preciseHit->globalPosition().y();

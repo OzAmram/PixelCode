@@ -106,63 +106,7 @@
 // Flag for new tracking rechis, has to be ON for pre7 and later   
 #define NEW_TRACKINGRECHITS  // For V71X_pre7 and later 
 
-struct Histos{
-  TH1D *hclusprob_fpix;
-
-  TProfile *h420f2_123_eta, *h421f2_123_eta, *h420f3_234_eta, *h421f3_234_eta, *h420f4_234_eta, *h421f4_234_eta;
-
-  TProfile *h043, *h044;
-  TH1D     *h030, *h031, *h032, *h035, *h036, *h036_1, *h037, *h038, *h037_1, *h039, *h040, *h041, *h042;
-
-  TH1D *h420f1_123, *h421f1_123, *h420f2_123, *h421f2_123, *h420f3_123, *h421f3_123;
-  TH1D *h420f2_123_r2, *h421f2_123_r2, *h420f2_123_r1, *h421f2_123_r1;
-  TH1D *h077f1_123, *h078f1_123, *h079f1_123, *h069f1_123;
-  TH1D *h077f2_123, *h078f2_123, *h079f2_123, *h069f2_123;
-  TH1D *h077f3_123, *h078f3_123, *h079f3_123, *h069f3_123;
-
-  TH1D *h420b1_123, *h421b1_123, *h420b2_123, *h421b2_123, *h420b3_123, *h421b3_123;
-  TH1D *h077b1_123, *h078b1_123, *h079b1_123, *h069b1_123;
-  TH1D *h077b2_123, *h078b2_123, *h079b2_123, *h069b2_123;
-  TH1D *h077b3_123, *h078b3_123, *h079b3_123, *h069b3_123;
-
-  TH1D *h420f1_124, *h421f1_124, *h420f2_124, *h421f2_124, *h420f4_124, *h421f4_124;
-  TH1D *h077f1_124, *h078f1_124, *h079f1_124, *h069f1_124;
-  TH1D *h077f2_124, *h078f2_124, *h079f2_124, *h069f2_124;
-  TH1D *h077f4_124, *h078f4_124, *h079f4_124, *h069f4_124;
-
-  TH1D *h420b1_124, *h421b1_124, *h420b2_124, *h421b2_124, *h420b4_124, *h421b4_124;
-  TH1D *h077b1_124, *h078b1_124, *h079b1_124, *h069b1_124;
-  TH1D *h077b2_124, *h078b2_124, *h079b2_124, *h069b2_124;
-  TH1D *h077b4_124, *h078b4_124, *h079b4_124, *h069b4_124;
-
-  TH1D *h420f1_134, *h421f1_134, *h420f3_134, *h421f3_134, *h420f4_134, *h421f4_134;
-  TH1D *h077f1_134, *h078f1_134, *h079f1_134, *h069f1_134;
-  TH1D *h077f3_134, *h078f3_134, *h079f3_134, *h069f3_134;
-  TH1D *h077f4_134, *h078f4_134, *h079f4_134, *h069f4_134;
-
-  TH1D *h420b1_134, *h421b1_134, *h420b3_134, *h421b3_134, *h420b4_134, *h421b4_134;
-  TH1D *h077b1_134, *h078b1_134, *h079b1_134, *h069b1_134;
-  TH1D *h077b3_134, *h078b3_134, *h079b3_134, *h069b3_134;
-  TH1D *h077b4_134, *h078b4_134, *h079b4_134, *h069b4_134;
-
-  TH1D *h420f2_234, *h421f2_234, *h420f3_234, *h421f3_234, *h420f4_234, *h421f4_234;
-  TH1D *h421f3_234_r1, *h420f3_234_r1, *h421f4_234_r1, *h420f4_234_r1;
-  TH1D *h421f3_234_r2, *h420f3_234_r2, *h421f4_234_r2, *h420f4_234_r2;
-  TH1D *h077f2_234, *h078f2_234, *h079f2_234, *h069f2_234;
-  TH1D *h077f3_234, *h078f3_234, *h079f3_234, *h069f3_234;
-  TH1D *h077f4_234, *h078f4_234, *h079f4_234, *h069f4_234;
-
-  TH1D *h420b2_234, *h421b2_234, *h420b3_234, *h421b3_234, *h420b4_234, *h421b4_234;
-  TH1D *h077b2_234, *h078b2_234, *h079b2_234, *h069b2_234;
-  TH1D *h077b3_234, *h078b3_234, *h079b3_234, *h069b3_234;
-  TH1D *h077b4_234, *h078b4_234, *h079b4_234, *h069b4_234;
-
-
-  void InitBPix(TFileDirectory* fs);
-  void InitFPix(TFileDirectory* fs);
-};
-
-class Pixel_phase1 : public edm::EDAnalyzer, public Histos {
+class Pixel_phase1 : public edm::EDAnalyzer{
 public:
   explicit Pixel_phase1(const edm::ParameterSet&);
   ~Pixel_phase1();
@@ -202,28 +146,19 @@ private:
 
   bool isTriplet;
   TTree * tree;
-  std::vector<float> dx_resolution_study_1;
-  std::vector<float> dz_resolution_study_1;
-  std::vector<float> dx_resolution_study_2;
-  std::vector<float> dz_resolution_study_2;
-  std::vector<float> dx_resolution_study_3;
-  std::vector<float> dz_resolution_study_3;
-  std::vector<float> pt_resolution_study;
-  std::vector<float> pt_resolution_study_refit;
-  int number_of_tracks;
-  std::vector<float> pt_all_tracks;
-  std::vector<int> cluster_size_all_tracks;
-  std::vector<int> hits_on_track_barrel;
-  std::vector<int> hits_on_track_endcap;
-  std::vector<int> hits_on_track_tracker;
-  std::vector<int> cluster_size_resolution_study;
-  std::vector<float> layers_with_measurement;
-  std::vector<float> disks_with_measurement;
-  int numberOfTracksCount = 0;
-  int numberOfTracksCount123 = 0;
-  int numberOfTracksCount124 = 0;
-  int numberOfTracksCount234 = 0;
-  int numberOfTracksCount134 = 0;
+
+  Double_t layer1dx, layer1dz, layer2dx, layer2dz, layer3dx, layer3dz;
+  Double_t trkEta, trkPt;
+  Int_t layer1EdgeTypeY, layer2EdgeTypeY, layer3EdgeTypeY;
+  Int_t layer1EdgeTypeX, layer2EdgeTypeX, layer3EdgeTypeX;
+  bool layer1HasBadPixels, layer2HasBadPixels, layer3HasBadPixels;
+  bool layer1OnEdge, layer2OnEdge, layer3OnEdge;
+  Int_t pxn1, pxn2, pxn3, pxn4;
+  Int_t layer1xmax, layer1xmin, layer1ymin, layer1ymax, layer1SizeY, layer1SizeX;
+  Int_t layer2xmax, layer2xmin, layer2ymin, layer2ymax, layer2SizeY, layer2SizeX;
+  Int_t layer3xmax, layer3xmin, layer3ymin, layer3ymax, layer3SizeY, layer3SizeX;
+  Float_t layer1Charge, layer2Charge, layer3Charge;
+
 
   edm::EDGetTokenT<reco::BeamSpot>  t_offlineBeamSpot_;
   edm::EDGetTokenT<reco::VertexCollection> t_offlinePrimaryVertices_ ;
@@ -231,7 +166,6 @@ private:
   edm::EDGetTokenT< edm::View<reco::PFMET>> t_pfMet_;
 
   // ----------member data ---------------------------
-  std::map<int, Histos> runmap;
 
   std::string processName_;
   int run_num = -999;
@@ -394,21 +328,49 @@ Pixel_phase1::Pixel_phase1(const edm::ParameterSet& iConfig)
   
   edm::Service<TFileService> fsT;
   tree = fsT->make<TTree>("tree", "tree");
-  tree->Branch("number_of_tracks", &number_of_tracks);
-  tree->Branch("pt_all_tracks", &pt_all_tracks);
-  tree->Branch("cluster_size_all_tracks", &cluster_size_all_tracks);
-  tree->Branch("cluster_size_resolution_study", &cluster_size_resolution_study);
-  tree->Branch("pt_resolution_study_refit", &pt_resolution_study_refit);
-  tree->Branch("dx_resolution_study_1", &dx_resolution_study_1);
-  tree->Branch("dz_resolution_study_1", &dz_resolution_study_1);
-  tree->Branch("dx_resolution_study_2", &dx_resolution_study_2);
-  tree->Branch("dz_resolution_study_2", &dz_resolution_study_2);
-  tree->Branch("dx_resolution_study_3", &dx_resolution_study_3);
-  tree->Branch("dz_resolution_study_3", &dz_resolution_study_3);
-  tree->Branch("pt_resolution_study", &pt_resolution_study);
-  tree->Branch("hits_on_track_barrel", &hits_on_track_barrel);
-  tree->Branch("hits_on_track_endcap", &hits_on_track_endcap);
-  tree->Branch("hits_on_track_tracker", &hits_on_track_tracker);
+  tree->Branch("layer1dx", &layer1dx);
+  tree->Branch("layer1dz", &layer1dz);
+  tree->Branch("layer2dx", &layer2dx);
+  tree->Branch("layer2dz", &layer2dz);
+  tree->Branch("layer3dx", &layer3dx);
+  tree->Branch("layer3dz", &layer3dz);
+  tree->Branch("pxn1", &pxn1);
+  tree->Branch("pxn2", &pxn2);
+  tree->Branch("pxn3", &pxn3);
+  tree->Branch("pxn4", &pxn4);
+  tree->Branch("trkEta", &trkEta);
+  tree->Branch("trkPt", &trkPt);
+  tree->Branch("layer1OnEdge", &layer1OnEdge);
+  tree->Branch("layer2OnEdge", &layer2OnEdge);
+  tree->Branch("layer3OnEdge", &layer3OnEdge);
+  tree->Branch("layer1HasBadPixels", &layer1HasBadPixels);
+  tree->Branch("layer2HasBadPixels", &layer2HasBadPixels);
+  tree->Branch("layer3HasBadPixels", &layer3HasBadPixels);
+
+  tree->Branch("layer1SizeX", &layer1SizeX);
+  tree->Branch("layer1SizeY", &layer1SizeY);
+  tree->Branch("layer1xmax", &layer1xmax);
+  tree->Branch("layer1xmin", &layer1xmin);
+  tree->Branch("layer1ymax", &layer1ymax);
+  tree->Branch("layer1ymin", &layer1ymin);
+
+  tree->Branch("layer2SizeX", &layer2SizeX);
+  tree->Branch("layer2SizeY", &layer2SizeY);
+  tree->Branch("layer2xmax", &layer2xmax);
+  tree->Branch("layer2xmin", &layer2xmin);
+  tree->Branch("layer2ymax", &layer2ymax);
+  tree->Branch("layer2ymin", &layer2ymin);
+
+  tree->Branch("layer3SizeX", &layer3SizeX);
+  tree->Branch("layer3SizeY", &layer3SizeY);
+  tree->Branch("layer3xmax", &layer3xmax);
+  tree->Branch("layer3xmin", &layer3xmin);
+  tree->Branch("layer3ymax", &layer3ymax);
+  tree->Branch("layer3ymin", &layer3ymin);
+
+  tree->Branch("layer1Charge", &layer1Charge);
+  tree->Branch("layer2Charge", &layer2Charge);
+  tree->Branch("layer3Charge", &layer3Charge);
 
 }
 Pixel_phase1::~Pixel_phase1()
@@ -417,235 +379,6 @@ Pixel_phase1::~Pixel_phase1()
    // (e.g. close files, deallocate resources etc.)
 }
 
-
-void Histos::InitFPix(TFileDirectory* fs)
-{
-  /*         Initialize histograms for FPIX residuals         */
-  /*h040 = fs->make<TH1D>( "h040", "b_{xy}, p_{t} > 8, FXD2;b_{xy} [#mum];tracks", 100, -250, 250 );
-  h041 = fs->make<TH1D>( "h041", "#sigma(d_{xy}), p_{t} > 8, FXD2;#sigma(d_{xy}) [#mum];tracks", 100, 0, 100 );
-  h042 = fs->make<TH1D>( "h042", "b_{xy}/#sigma, p_{t} > 8, FXD2;b_{xy}/#sigma;tracks", 100, -10, 10 );
-  h043 = fs->make<TProfile>( "h043", "#sigma(b_{xy}) vs logp_{t} with FXD2;log(p_{t} [GeV]);<#sigma(b_{xy})> [#mum]", 40, 0, 2, 0, 5000 );
-  h044 = fs->make<TProfile>( "h044", "rms(b_{xy}) vs logp_{t} with FXD2;log(p_{t} [GeV]);rms(b_{xy}) [#mum]", 40, 0, 2, 0, 5000 );
-  */
-
-  h030 = fs->make<TH1D>( "h030", "number of tracks;tracks", 200, 0, 2000 );
-  h031 = fs->make<TH1D>( "h031", "track charge;charge", 11, -5.5, 5.5 );
-  h032 = fs->make<TH1D>( "h032", "p_{t};p_{t} [GeV]", 1000, 0, 100 );
-
-  h035 = fs->make<TH1D>( "h035", "valid tracker hits", 41, -0.5, 40.5 );
-  h036 = fs->make<TH1D>( "h036", "valid pixel barrel hits", 7, -0.5, 6.5 );
-  h036_1 = fs->make<TH1D>( "h036_1", "valid pixel endcap hits", 7, -0.5, 6.5 );
-  h037 = fs->make<TH1D>( "h037", "tracker layers", 31, -0.5, 30.5 );
-  h037_1 = fs->make<TH1D>( "h037_1", "tracker layers; tracks pt>4", 31, -0.5, 30.5 );
-  h038 = fs->make<TH1D>( "h038", "pixel barrel layers", 6, -0.5, 5.5 );
-  h039 = fs->make<TH1D>( "h039", "pixel endcap layers", 6, -0.5, 5.5 );
-  h040 = fs->make<TH1D>( "h040", "normalised chis2", 100, 0., 10. );
-  h041 = fs->make<TH1D>( "h041", "pt error", 100, 0, 10);
-  h042 = fs->make<TH1D>( "h042", "track quality", 20, 0, 20 );
-
-  h043 = fs->make<TProfile>( "h043", "chis vs layers", 20, 0, 20, 0, 100 );
-  h044 = fs->make<TProfile>( "h044", "ptErrpr quality vs layers", 20, 0, 20, 0, 100 );
-
-  hclusprob_fpix = fs->make<TH1D>( "hclusprob_fpix", "FPix Cluster Probability;", 120, 0, 1.2 );
-
-  h420f2_123_eta = fs->make<TProfile>( "h420f2_123_eta", "PXF1 residuals #Deltax, p_{t} > 4;PXF1 #Deltax [#mum]; Track eta;PXF1 rms(#Deltax) [#mum]", 100, -4., 4., 0, 199 );
-  h420f3_234_eta = fs->make<TProfile>( "h420f3_234_eta", "PXF2 residuals #Deltax, p_{t} > 4;PXF2 #Deltax [#mum]; Track eta;PXF2 rms(#Deltax) [#mum]", 100, -4., 4., 0, 199 );
-  h420f4_234_eta = fs->make<TProfile>( "h420f4_234_eta", "PXF3 residuals #Deltax, p_{t} > 4;PXF3 #Deltax [#mum]; Track eta;PXF3 rms(#Deltax) [#mum]", 100, -4., 4., 0, 199 );
-  h421f2_123_eta = fs->make<TProfile>( "h421f2_123_eta", "PXF1 residuals #Deltay, p_{t} > 4;PXF1 #Deltay [#mum]; Track eta;PXF1 rms(#Deltay) [#mum]", 100, -4., 4., 0, 199 );
-  h421f3_234_eta = fs->make<TProfile>( "h421f3_234_eta", "PXF2 residuals #Deltay, p_{t} > 4;PXF2 #Deltay [#mum]; Track eta;PXF2 rms(#Deltay) [#mum]", 100, -4., 4., 0, 199 );
-  h421f4_234_eta = fs->make<TProfile>( "h421f4_234_eta", "PXF3 residuals #Deltay, p_{t} > 4;PXF3 #Deltay [#mum]; Track eta;PXF3 rms(#Deltay) [#mum]", 100, -4., 4., 0, 199 );
-
-  h420f1_123 = fs->make<TH1D>( "h420f1_123", "PXB1 residuals #Deltax, p_{t} > 4;PXB1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f2_123 = fs->make<TH1D>( "h420f2_123", "PXF1 residuals #Deltax, p_{t} > 4;PXF1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f2_123_r1 = fs->make<TH1D>( "h420f2_123_r1", "PXF1 residuals #Deltax on inner ring, p_{t} > 4;PXF1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f2_123_r2 = fs->make<TH1D>( "h420f2_123_r2", "PXF1 residuals #Deltax on outer ring, p_{t} > 4;PXF1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f3_123 = fs->make<TH1D>( "h420f3_123", "PXF2 residuals #Deltax, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h421f1_123 = fs->make<TH1D>( "h421f1_123", "PXB1 residuals #Deltay, p_{t} > 4;PXB1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f2_123_r2 = fs->make<TH1D>( "h421f2_123_r2", "PXF1 residuals #Deltay on outer ring, p_{t} > 4;PXF1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f2_123_r1 = fs->make<TH1D>( "h421f2_123_r1", "PXF1 residuals #Deltay on inner ring, p_{t} > 4;PXF1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f2_123 = fs->make<TH1D>( "h421f2_123", "PXF1 residuals #Deltay, p_{t} > 4;PXF1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f3_123 = fs->make<TH1D>( "h421f3_123", "PXF2 residuals #Deltay, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h077f1_123 = fs->make<TH1D>( "h077f1_123", "PXB1 x error ", 100, 0., 100. );
-  h077f2_123 = fs->make<TH1D>( "h077f2_123", "PXF1 x error ", 100, 0., 100. );
-  h077f3_123 = fs->make<TH1D>( "h077f3_123", "PXF2 x error ", 100, 0., 100. );
-
-  h078f1_123 = fs->make<TH1D>( "h078f1_123", "PXB1 y error ", 100, 0., 100. );
-  h078f2_123 = fs->make<TH1D>( "h078f2_123", "PXF1 y error ", 100, 0., 100. );
-  h078f3_123 = fs->make<TH1D>( "h078f3_123", "PXF2 y error ", 100, 0., 100. );
-
-  h079f1_123 = fs->make<TH1D>( "h079f1_123", "PXB1 x pull ", 100, -10., 10. );
-  h079f2_123 = fs->make<TH1D>( "h079f2_123", "PXF1 x pull ", 100, -10., 10. );
-  h079f3_123 = fs->make<TH1D>( "h079f3_123", "PXF2 x pull ", 100, -10., 10. );
-
-  h069f1_123 = fs->make<TH1D>( "h069f1_123", "PXB1 y pull ", 100, -10., 10. );
-  h069f2_123 = fs->make<TH1D>( "h069f2_123", "PXF1 y pull ", 100, -10., 10. );
-  h069f3_123 = fs->make<TH1D>( "h069f3_123", "PXF2 y pull ", 100, -10., 10. );
-
-  h420f1_124 = fs->make<TH1D>( "h420f1_124", "PXB1 residuals #Deltax, p_{t} > 4;PXB1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f2_124 = fs->make<TH1D>( "h420f2_124", "PXF1 residuals #Deltax, p_{t} > 4;PXF1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f4_124 = fs->make<TH1D>( "h420f4_124", "PXF2 residuals #Deltax, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h421f1_124 = fs->make<TH1D>( "h421f1_124", "PXB1 residuals #Deltay, p_{t} > 4;PXB1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f2_124 = fs->make<TH1D>( "h421f2_124", "PXF1 residuals #Deltay, p_{t} > 4;PXF1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f4_124 = fs->make<TH1D>( "h421f4_124", "PXF2 residuals #Deltay, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h077f1_124 = fs->make<TH1D>( "h077f1_124", "PXB1 x error ", 100, 0., 100. );
-  h077f2_124 = fs->make<TH1D>( "h077f2_124", "PXF1 x error ", 100, 0., 100. );
-  h077f4_124 = fs->make<TH1D>( "h077f4_124", "PXF2 x error ", 100, 0., 100. );
-
-  h078f1_124 = fs->make<TH1D>( "h078f1_124", "PXB1 y error ", 100, 0., 100. );
-  h078f2_124 = fs->make<TH1D>( "h078f2_124", "PXF1 y error ", 100, 0., 100. );
-  h078f4_124 = fs->make<TH1D>( "h078f4_124", "PXF2 y error ", 100, 0., 100. );
-
-  h079f1_124 = fs->make<TH1D>( "h079f1_124", "PXB1 x pull ", 100, -10., 10. );
-  h079f2_124 = fs->make<TH1D>( "h079f2_124", "PXF1 x pull ", 100, -10., 10. );
-  h079f4_124 = fs->make<TH1D>( "h079f4_124", "PXF2 x pull ", 100, -10., 10. );
-
-  h069f1_124 = fs->make<TH1D>( "h069f1_124", "PXB1 y pull ", 100, -10., 10. );
-  h069f2_124 = fs->make<TH1D>( "h069f2_124", "PXF1 y pull ", 100, -10., 10. );
-  h069f4_124 = fs->make<TH1D>( "h069f4_124", "PXF2 y pull ", 100, -10., 10. );
-
-  h420f1_134 = fs->make<TH1D>( "h420f1_134", "PXB1 residuals #Deltax, p_{t} > 4;PXB1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f3_134 = fs->make<TH1D>( "h420f3_134", "PXF1 residuals #Deltax, p_{t} > 4;PXF1 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f4_134 = fs->make<TH1D>( "h420f4_134", "PXF2 residuals #Deltax, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h421f1_134 = fs->make<TH1D>( "h421f1_134", "PXB1 residuals #Deltay, p_{t} > 4;PXB1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f3_134 = fs->make<TH1D>( "h421f3_134", "PXF1 residuals #Deltay, p_{t} > 4;PXF1 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f4_134 = fs->make<TH1D>( "h421f4_134", "PXF2 residuals #Deltay, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h077f1_134 = fs->make<TH1D>( "h077f1_134", "PXB1 x error ", 100, 0., 100. );
-  h077f3_134 = fs->make<TH1D>( "h077f3_134", "PXF1 x error ", 100, 0., 100. );
-  h077f4_134 = fs->make<TH1D>( "h077f4_134", "PXF2 x error ", 100, 0., 100. );
-
-  h078f1_134 = fs->make<TH1D>( "h078f1_134", "PXB1 y error ", 100, 0., 100. );
-  h078f3_134 = fs->make<TH1D>( "h078f3_134", "PXF1 y error ", 100, 0., 100. );
-  h078f4_134 = fs->make<TH1D>( "h078f4_134", "PXF2 y error ", 100, 0., 100. );
-
-  h079f1_134 = fs->make<TH1D>( "h079f1_134", "PXB1 x pull ", 100, -10., 10. );
-  h079f3_134 = fs->make<TH1D>( "h079f3_134", "PXF1 x pull ", 100, -10., 10. );
-  h079f4_134 = fs->make<TH1D>( "h079f4_134", "PXF2 x pull ", 100, -10., 10. );
-
-  h069f1_134 = fs->make<TH1D>( "h069f1_134", "PXB1 y pull ", 100, -10., 10. );
-  h069f3_134 = fs->make<TH1D>( "h069f3_134", "PXF1 y pull ", 100, -10., 10. );
-  h069f4_134 = fs->make<TH1D>( "h069f4_134", "PXF2 y pull ", 100, -10., 10. );
-
-  h420f2_234 = fs->make<TH1D>( "h420f2_234", "PXB2 residuals #Deltax, p_{t} > 4;PXB2 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f3_234 = fs->make<TH1D>( "h420f3_234", "PXF2 residuals #Deltax, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f4_234 = fs->make<TH1D>( "h420f4_234", "PXF3 residuals #Deltax, p_{t} > 4;PXF3 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h420f3_234_r1 = fs->make<TH1D>( "h420f3_234_r1", "PXF2 residuals #Deltax on inner ring, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f4_234_r1 = fs->make<TH1D>( "h420f4_234_r1", "PXF3 residuals #Deltax on inner ring, p_{t} > 4;PXF3 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h420f3_234_r2 = fs->make<TH1D>( "h420f3_234_r2", "PXF2 residuals #Deltax on outer ring, p_{t} > 4;PXF2 #Deltax [#mum];hits", 600, -150, 150 );
-  h420f4_234_r2 = fs->make<TH1D>( "h420f4_234_r2", "PXF3 residuals #Deltax on outer ring, p_{t} > 4;PXF3 #Deltax [#mum];hits", 600, -150, 150 );
-
-  h421f2_234 = fs->make<TH1D>( "h421f2_234", "PXB2 residuals #Deltay, p_{t} > 4;PXB2 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f3_234 = fs->make<TH1D>( "h421f3_234", "PXF2 residuals #Deltay, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f4_234 = fs->make<TH1D>( "h421f4_234", "PXF3 residuals #Deltay, p_{t} > 4;PXF3 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h421f3_234_r1 = fs->make<TH1D>( "h421f3_234_r1", "PXF2 residuals #Deltay on inner ring, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f4_234_r1 = fs->make<TH1D>( "h421f4_234_r1", "PXF3 residuals #Deltay on inner ring, p_{t} > 4;PXF3 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h421f3_234_r2 = fs->make<TH1D>( "h421f3_234_r2", "PXF2 residuals #Deltay on outer ring, p_{t} > 4;PXF2 #Deltay [#mum];hits", 600, -300, 300 );
-  h421f4_234_r2 = fs->make<TH1D>( "h421f4_234_r2", "PXF3 residuals #Deltay on outer ring, p_{t} > 4;PXF3 #Deltay [#mum];hits", 600, -300, 300 );
-
-  h077f2_234 = fs->make<TH1D>( "h077f2_234", "PXB2 x error ", 100, 0., 100. );
-  h077f3_234 = fs->make<TH1D>( "h077f3_234", "PXF2 x error ", 100, 0., 100. );
-  h077f4_234 = fs->make<TH1D>( "h077f4_234", "PXF3 x error ", 100, 0., 100. );
-
-  h078f2_234 = fs->make<TH1D>( "h078f2_234", "PXB2 y error ", 100, 0., 100. );
-  h078f3_234 = fs->make<TH1D>( "h078f3_234", "PXF2 y error ", 100, 0., 100. );
-  h078f4_234 = fs->make<TH1D>( "h078f4_234", "PXF3 y error ", 100, 0., 100. );
-
-  h079f2_234 = fs->make<TH1D>( "h079f2_234", "PXB2 x pull ", 100, -10., 10. );
-  h079f3_234 = fs->make<TH1D>( "h079f3_234", "PXF2 x pull ", 100, -10., 10. );
-  h079f4_234 = fs->make<TH1D>( "h079f4_234", "PXF3 x pull ", 100, -10., 10. );
-
-  h069f2_234 = fs->make<TH1D>( "h069f2_234", "PXB2 y pull ", 100, -10., 10. );
-  h069f3_234 = fs->make<TH1D>( "h069f3_234", "PXF2 y pull ", 100, -10., 10. );
-  h069f4_234 = fs->make<TH1D>( "h069f4_234", "PXF3 y pull ", 100, -10., 10. );
-
-}
-
-void Histos::InitBPix(TFileDirectory* fs)
-{
-  /*         Initialize histograms for BPIX residuals         */
-  
-  h420b1_123 = fs->make<TH1D>( "h420b1_123", "PXB1 residuals #Deltax, p_{t} > 12;PXB1 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b2_123 = fs->make<TH1D>( "h420b2_123", "PXB2 residuals #Deltax, p_{t} > 12;PXB2 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b3_123 = fs->make<TH1D>( "h420b3_123", "PXB3 residuals #Deltax, p_{t} > 12;PXB3 #Deltax [#mum];hits", 100, -150, 150 );
-
-  h421b1_123 = fs->make<TH1D>( "h421b1_123", "PXB1 residuals #Deltay, p_{t} > 12;PXB1 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b2_123 = fs->make<TH1D>( "h421b2_123", "PXB2 residuals #Deltay, p_{t} > 12;PXB2 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b3_123 = fs->make<TH1D>( "h421b3_123", "PXB3 residuals #Deltay, p_{t} > 12;PXB3 #Deltay [#mum];hits", 100, -300, 300 );
-
-  h077b1_123 = fs->make<TH1D>( "h077b1_123", "PXB1 x error ", 100, 0., 100. );
-  h077b2_123 = fs->make<TH1D>( "h077b2_123", "PXB2 x error ", 100, 0., 100. );
-  h077b3_123 = fs->make<TH1D>( "h077b3_123", "PXB3 x error ", 100, 0., 100. );
-
-  h078b1_123 = fs->make<TH1D>( "h078b1_123", "PXB1 y error ", 100, 0., 100. );
-  h078b2_123 = fs->make<TH1D>( "h078b2_123", "PXB2 y error ", 100, 0., 100. );
-  h078b3_123 = fs->make<TH1D>( "h078b3_123", "PXB3 y error ", 100, 0., 100. );
-
-  h079b1_123 = fs->make<TH1D>( "h079b1_123", "PXB1 x pull ", 100, -10., 10. );
-  h079b2_123 = fs->make<TH1D>( "h079b2_123", "PXB2 x pull ", 100, -10., 10. );
-  h079b3_123 = fs->make<TH1D>( "h079b3_123", "PXB3 x pull ", 100, -10., 10. );
-
-  h069b1_123 = fs->make<TH1D>( "h069b1_123", "PXB1 y pull ", 100, -10., 10. );
-  h069b2_123 = fs->make<TH1D>( "h069b2_123", "PXB2 y pull ", 100, -10., 10. );
-  h069b3_123 = fs->make<TH1D>( "h069b3_123", "PXB3 y pull ", 100, -10., 10. );
-  
-  h420b1_124 = fs->make<TH1D>( "h420b1_124", "PXB1 residuals #Deltax, p_{t} > 12;PXB1 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b2_124 = fs->make<TH1D>( "h420b2_124", "PXB2 residuals #Deltax, p_{t} > 12;PXB2 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b4_124 = fs->make<TH1D>( "h420b4_124", "PXB3 residuals #Deltax, p_{t} > 12;PXB3 #Deltax [#mum];hits", 100, -150, 150 );
-
-  h421b1_124 = fs->make<TH1D>( "h421b1_124", "PXB1 residuals #Deltay, p_{t} > 12;PXB1 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b2_124 = fs->make<TH1D>( "h421b2_124", "PXB2 residuals #Deltay, p_{t} > 12;PXB2 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b4_124 = fs->make<TH1D>( "h421b4_124", "PXB3 residuals #Deltay, p_{t} > 12;PXB3 #Deltay [#mum];hits", 100, -300, 300 );
-
-  h077b1_124 = fs->make<TH1D>( "h077b1_124", "PXB1 x error ", 100, 0., 100. );
-  h077b2_124 = fs->make<TH1D>( "h077b2_124", "PXB2 x error ", 100, 0., 100. );
-  h077b4_124 = fs->make<TH1D>( "h077b4_124", "PXB3 x error ", 100, 0., 100. );
-
-  h078b1_124 = fs->make<TH1D>( "h078b1_124", "PXB1 y error ", 100, 0., 100. );
-  h078b2_124 = fs->make<TH1D>( "h078b2_124", "PXB2 y error ", 100, 0., 100. );
-  h078b4_124 = fs->make<TH1D>( "h078b4_124", "PXB3 y error ", 100, 0., 100. );
-
-  h079b1_124 = fs->make<TH1D>( "h079b1_124", "PXB1 x pull ", 100, -10., 10. );
-  h079b2_124 = fs->make<TH1D>( "h079b2_124", "PXB2 x pull ", 100, -10., 10. );
-  h079b4_124 = fs->make<TH1D>( "h079b4_124", "PXB3 x pull ", 100, -10., 10. );
-
-  h069b1_124 = fs->make<TH1D>( "h069b1_124", "PXB1 y pull ", 100, -10., 10. );
-  h069b2_124 = fs->make<TH1D>( "h069b2_124", "PXB2 y pull ", 100, -10., 10. );
-  h069b4_124 = fs->make<TH1D>( "h069b4_124", "PXB3 y pull ", 100, -10., 10. );
-
-  h420b1_134 = fs->make<TH1D>( "h420b1_134", "PXB1 residuals #Deltax, p_{t} > 12;PXB1 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b3_134 = fs->make<TH1D>( "h420b3_134", "PXB3 residuals #Deltax, p_{t} > 12;PXB3 #Deltax [#mum];hits", 100, -150, 150 );
-  h420b4_134 = fs->make<TH1D>( "h420b4_134", "PXB3 residuals #Deltax, p_{t} > 12;PXB3 #Deltax [#mum];hits", 100, -150, 150 );
-
-  h421b1_134 = fs->make<TH1D>( "h421b1_134", "PXB1 residuals #Deltay, p_{t} > 12;PXB1 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b3_134 = fs->make<TH1D>( "h421b3_134", "PXB3 residuals #Deltay, p_{t} > 12;PXB3 #Deltay [#mum];hits", 100, -300, 300 );
-  h421b4_134 = fs->make<TH1D>( "h421b4_134", "PXB3 residuals #Deltay, p_{t} > 12;PXB3 #Deltay [#mum];hits", 100, -300, 300 );
-
-  h077b1_134 = fs->make<TH1D>( "h077b1_134", "PXB1 x error ", 100, 0., 100. );
-  h077b3_134 = fs->make<TH1D>( "h077b3_134", "PXB3 x error ", 100, 0., 100. );
-  h077b4_134 = fs->make<TH1D>( "h077b4_134", "PXB3 x error ", 100, 0., 100. );
-
-  h078b1_134 = fs->make<TH1D>( "h078b1_134", "PXB1 y error ", 100, 0., 100. );
-  h078b3_134 = fs->make<TH1D>( "h078b3_134", "PXB3 y error ", 100, 0., 100. );
-  h078b4_134 = fs->make<TH1D>( "h078b4_134", "PXB3 y error ", 100, 0., 100. );
-
-  h079b1_134 = fs->make<TH1D>( "h079b1_134", "PXB1 x pull ", 100, -10., 10. );
-  h079b3_134 = fs->make<TH1D>( "h079b3_134", "PXB3 x pull ", 100, -10., 10. );
-  h079b4_134 = fs->make<TH1D>( "h079b4_134", "PXB3 x pull ", 100, -10., 10. );
-
-  h069b1_134 = fs->make<TH1D>( "h069b1_134", "PXB1 y pull ", 100, -10., 10. );
-  h069b3_134 = fs->make<TH1D>( "h069b3_134", "PXB3 y pull ", 100, -10., 10. );
-  h069b4_134 = fs->make<TH1D>( "h069b4_134", "PXB3 y pull ", 100, -10., 10. );
-
-}
 
 // member functions:
 // method called once each job just before starting event loop
@@ -660,39 +393,6 @@ void Pixel_phase1::beginJob()
 
 void Pixel_phase1::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 {
-
-  const int run = iRun.run();
-
-  std::map<int, Histos>::iterator iter = runmap.find(run);
-  if(iter != runmap.end())
-    {
-
-      static_cast<Histos&>(*this) = iter->second;
-    }
-  else
-    {
-      edm::Service<TFileService> fs;
-
-      std::stringstream runstr;
-      runstr << "Run" << run;
-      TFileDirectory subdir = fs->mkdir(runstr.str().c_str());
-
-      if(doBPix){
-	runmap[run].InitBPix(&subdir);
-      }
-      if(doFPix){
-	runmap[run].InitFPix(&subdir);
-      }
-      static_cast<Histos&>(*this) = runmap[run];
-    }
-  
-  bool hltSetupChanged = false;
-  /*
-  if(_triggerSrc.label()!="") {
-    if(!HLTConfig.init(iRun, iSetup, _triggerSrc.process(), hltSetupChanged))
-      throw cms::Exception("Failed to init HLT config");
-  }
-  */
 }
 
 std::vector<double> Pixel_phase1::getIntersection(std::vector<double> point1, std::vector<double> point2, double rho,  const GeomDet *detHit, std::vector<double> intersection){
@@ -737,36 +437,8 @@ std::vector<double> Pixel_phase1::getIntersection(std::vector<double> point1, st
 
 
 void Pixel_phase1::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
-  /*  Run for either/both FPix or BPix residuals  */
 
-  dx_resolution_study_1.clear();
-  dz_resolution_study_1.clear();
-  dx_resolution_study_2.clear();
-  dz_resolution_study_2.clear();
-  dx_resolution_study_3.clear();
-  dz_resolution_study_3.clear();
-  pt_resolution_study.clear();
-  pt_resolution_study_refit.clear();
-  pt_all_tracks.clear();
-  cluster_size_all_tracks.clear();
-  hits_on_track_barrel.clear();
-  hits_on_track_endcap.clear();
-  hits_on_track_tracker.clear();
-  cluster_size_resolution_study.clear();
-  layers_with_measurement.clear();
-  disks_with_measurement.clear();
   bool isTriplet;
-
-  pt_res = -9999.;
-  pt_res_refit = -9999.;
-  cluster_size_res_init = 0;
-  cluster_size_res = 0;
-  hits_track = 0;
-  hits_barrel = 0;
-  hits_endcap = 0;
-  ls_with_measure = 0;
-  number_of_tracks = 0;
-
 
   if(doFPix && (int)iEvent.orbitNumber() >= (int)_orbit_beginning && (int)iEvent.orbitNumber()<= (int)_orbit_end ){
     std::string detTag = "fpix";
@@ -785,9 +457,6 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
   using namespace edm;
   using namespace reco;
   using namespace math;
-  
-  //const double wt = 180/pi;  // Unused
-  //const double pi = 4*atan(1); // Ditto 
   
   myCountersPixel_phase1::neve++;
   
@@ -820,133 +489,87 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
   // beam spot:
   
   edm::Handle<reco::BeamSpot> rbs;
-  //  iEvent.getByLabel( "offlineBeamSpot", rbs );
   iEvent.getByToken( t_offlineBeamSpot_, rbs );
 
-  XYZPoint bsP = XYZPoint(0,0,0);        // beam spot point
-  //int ibs = 0;
-
+  XYZPoint bsP = XYZPoint(0,0,0);       
   if( rbs.failedToGet() ) return;
   if( ! rbs.isValid() ) return;
-
-  //ibs = 1;
-
   bsP = XYZPoint( rbs->x0(), rbs->y0(), rbs->z0() );
 
   double bx = rbs->BeamWidthX();
   double by = rbs->BeamWidthY();
-
-  if( idbg ){
-    cout << "beam spot x " << rbs->x0();
-    cout << ", y " << rbs->y0();
-    cout << ", z " << rbs->z0();
-    cout << endl;
-  }
  
   //Retrieve tracker topology from geometry
   edm::ESHandle<TrackerTopology> tTopoH;
   iSetup.get<TrackerTopologyRcd>().get(tTopoH);
   const TrackerTopology *tTopo=tTopoH.product();
 
-  //--------------------------------------------------------------------
   // primary vertices:
   Handle<VertexCollection> vertices;
-  //  iEvent.getByLabel( "offlinePrimaryVertices", vertices );
   iEvent.getByToken( t_offlinePrimaryVertices_,vertices );
   if( vertices.failedToGet() ) return;
   if( !vertices.isValid() ) return;
-
-  // need vertex global point for tracks
-  // from #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
-  // Global points are three-dimensional by default
-  // typedef Global3DPoint  GlobalPoint;
-  // typedef Point3DBase< float, GlobalTag> Global3DPoint;
-  
-  //XYZPoint vtxN = XYZPoint(0,0,0);    // Not sure of the purpose for vtxN
-  XYZPoint vtxP = XYZPoint(0,0,0);    //
+  int nvertex = vertices->size();
+  XYZPoint vtxN = XYZPoint(0,0,0);
+  XYZPoint vtxP = XYZPoint(0,0,0);
+  double bestNdof = 0;
+  double maxSumPt = 0;
   Vertex bestPvx;
-  
-  /*double xBS = 0;
-  double yBS = 0;
-  if( ibs ) {
-    xBS = bsP.x();
-    yBS = bsP.y();
+  for( VertexCollection::const_iterator iVertex = vertices->begin();
+       iVertex != vertices->end(); ++iVertex ) {
+    if( ! iVertex->isValid() ) continue;
+    else {
+      if( iVertex->isFake() ) continue;
+      else{
+	if( iVertex->ndof() > bestNdof ) {
+	  bestNdof = iVertex->ndof();
+	  vtxN = XYZPoint( iVertex->x(), iVertex->y(), iVertex->z() );
+	}
+	if( iVertex->p4().pt() > maxSumPt ) {
+	  maxSumPt = iVertex->p4().pt();
+	  vtxP = XYZPoint( iVertex->x(), iVertex->y(), iVertex->z() );
+	  bestPvx = *iVertex;
+	}
+      }
+    }
   }
-  else {
-    xBS = vtxP.x();
-    yBS = vtxP.y();
-    }*/
-  
-  //--------------------------------------------------------------------
-  // MET:
-  
+  if( maxSumPt < 1 ) return;
+
+  // MET:  
   edm::Handle< edm::View<reco::PFMET> > pfMEThandle;
-  //  iEvent.getByLabel( "pfMet", pfMEThandle );
   iEvent.getByToken(t_pfMet_, pfMEThandle );
   
-  //--------------------------------------------------------------------
   // get a fitter to refit TrackCandidates, the same fitter as used in standard reconstruction:
-  // Fitter = cms.string('KFFittingSmootherWithOutliersRejectionAndRK'),
-  // KalmanFilter
-  // RungeKutta
   
-  
-#ifdef NEW_TRACKINGRECHITS
-
   // Fitter                                                                                                                                                                         
   edm::ESHandle<TrajectoryFitter> aFitter;
   iSetup.get<TrajectoryFitter::Record>().get("KFFittingSmootherWithOutliersRejectionAndRK",aFitter);
   std::unique_ptr<TrajectoryFitter> theFitter = aFitter->clone();         // pointer which destroys object when pointer out of scope
   
-  //----------------------------------------------------------------------------                                                                                                                        
-  // Transient Rechit Builders                                                                                                                                                                          
+  // Transient Rechit Builders                                                                                                                                                     
   edm::ESHandle<TransientTrackBuilder> theB;
   iSetup.get<TransientTrackRecord>().get( "TransientTrackBuilder", theB );
   
-  // Transient rec hits:                                                                                                                                                                                
+  // Transient rec hits:                                                                                                                                                          
   ESHandle<TransientTrackingRecHitBuilder> hitBuilder;
   iSetup.get<TransientRecHitRecord>().get( _ttrhBuilder, hitBuilder );
   
-  // Cloner, New from 71Xpre7                                                                                                                                                                           
+  // Cloner, New from 71Xpre7                                                                                                                                                   
   const TkTransientTrackingRecHitBuilder * builder = static_cast<TkTransientTrackingRecHitBuilder const *>(hitBuilder.product());
   auto hitCloner = builder->cloner();
   theFitter->setHitCloner(&hitCloner);
   
-#else
-  //old
-  ESHandle<TrajectoryFitter> TF;
-  iSetup.get<TrajectoryFitter::Record>().get( "KFFittingSmootherWithOutliersRejectionAndRK", TF );
-  std::unique_ptr<TrajectoryFitter> theFitter = TF->clone();
-  
-  edm::ESHandle<TransientTrackBuilder> theB;
-  iSetup.get<TransientTrackRecord>().get( "TransientTrackBuilder", theB );
-  
-  // transient rec hits:                                                                                                                                                                                
-  ESHandle<TransientTrackingRecHitBuilder> hitBuilder;
-  iSetup.get<TransientRecHitRecord>().get( _ttrhBuilder, hitBuilder );
-  
-#endif
-  //-------------------------------------------------------------------- 
   // Trackpropagator:
   edm::ESHandle<Propagator> prop;
   iSetup.get<TrackingComponentsRecord>().get( "PropagatorWithMaterial", prop );
   const Propagator* thePropagator = prop.product();
   
-  //--------------------------------------------------------------------
   // tracks:
   Handle<TrackCollection> tracks;
-  //  iEvent.getByLabel( "generalTracks", tracks );
   iEvent.getByToken( t_generalTracks_, tracks );
   if( tracks.failedToGet() ) return;
   if( !tracks.isValid() ) return;
-  if( idbg ){
-    cout << "  tracks " << tracks->size();
-    cout << endl;
-  }
 
-  h030->Fill( tracks->size() );
-
-  //----------------------------------------------------------------------------
   // get tracker geometry:
   edm::ESHandle<TrackerGeometry> pTG;
   iSetup.get<TrackerDigiGeometryRecord>().get( pTG );
@@ -955,83 +578,24 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
     return;
   }
   
-  //----------------------------------------------------------------------------
-  // transient track builder, needs B-field from data base (global tag in .py)
-  
-  
-#if 0
-  edm::ESHandle<SiPixelLorentzAngle> SiPixelLorentzAngle_; 
-  iSetup.get<SiPixelLorentzAngleRcd>().get(SiPixelLorentzAngle_);
-  std::map<unsigned int,float> detid_la= SiPixelLorentzAngle_->getLorentzAngles();  // get Lorentz angles for subdetectors
-  std::map<unsigned int,float>::const_iterator it;
-  for (it=detid_la.begin();it!=detid_la.end();it++)
-    {
-      unsigned int subdet   = DetId(it->first).subdetId();
-      if(subdet == static_cast<int>(PixelSubdetector::PixelBarrel))   
-	//std::cout << it->first << ": " << it->second << std::endl;
-    }
-#endif
-  
-  //----------------------------------------------------------------------------
-  //                           Loop over tracks
-  //----------------------------------------------------------------------------   
 
   double sumpt = 0;     // total pt of tracks from vtx
   double sumq = 0;      // total charge from vtx
-  // Surface::GlobalPoint origin = Surface::GlobalPoint(0,0,0);
-  number_of_tracks = tracks->size();
+
   for( TrackCollection::const_iterator iTrack = tracks->begin();
        iTrack != tracks->end(); ++iTrack ) {
-    // cpt = cqRB = 0.3*R[m]*B[T] = 1.14*R[m] for B=3.8T
-    // D = 2R = 2*pt/1.14
-    // calo: D = 1.3 m => pt = 0.74 GeV/c
+
     isTriplet = true;
     double pt = iTrack->pt();
 
-    numberOfTracksCount++;
-    pt_all_tracks.push_back(pt);
+    trkPt = pt;
+    trkEta = iTrack->eta();
 
     if( abs( iTrack->dxy(vtxP) ) > 5*iTrack->dxyError() ) continue; // if trans. IP > 5x its error, skip
     sumpt += pt;
     sumq += iTrack->charge();
     double logpt = log(pt) / log(10);
-    const reco::HitPattern& hp = iTrack->hitPattern();
-    //double phi = iTrack->phi(); // Not used
-    //double eta = iTrack->eta(); // ditto 
-    //if( idbg ) {
-    //  cout << endl;
-    //  cout << "Track "  << distance( tracks->begin(), iTrack );
-    //  cout << ": pt "   << iTrack->pt();
-    //  cout << ", eta "  << eta;
-    //  cout << ", phi "  << phi*wt;
-    //  cout << setprecision(1);
-    //  cout << ", dxyv " << iTrack->dxy(vtxP)*1E4 << " um";
-    //  cout << ", dzv "  << iTrack->dz(vtxP)*1E1 << " mm";
-    //  cout << setprecision(4);
-    //  cout << ", hits " << hp.numberOfHits(HitPattern::TRACK_HITS); 
-    //  cout << ", valid "<< hp.numberOfValidTrackerHits();
-    //  cout << endl;
-    //}
-    
-    h031->Fill( iTrack->charge() );
-    h032->Fill( pt );
-
-    h035->Fill( hp.numberOfValidTrackerHits() );
-    h036->Fill( hp.numberOfValidPixelBarrelHits() );
-    h036_1->Fill( hp.numberOfValidPixelEndcapHits() );
-    h037->Fill( hp.trackerLayersWithMeasurement() );
-    h038->Fill( hp.pixelBarrelLayersWithMeasurement() );
-    h039->Fill( hp.pixelEndcapLayersWithMeasurement() );
-
-    if(pt>4)     {
-      h037_1->Fill( hp.trackerLayersWithMeasurement() );
-      h040->Fill( iTrack->normalizedChi2());
-      h041->Fill( iTrack->ptError());
-      h042->Fill( iTrack->qualityMask());
-      h043->Fill( hp.trackerLayersWithMeasurement(), iTrack->normalizedChi2());
-      h044->Fill( hp.trackerLayersWithMeasurement(), iTrack->ptError());
-
-    } 
+    const reco::HitPattern& hp = iTrack->hitPattern();    
 
     const double pi = 4*atan(1);
     const double wt = 180/pi;
@@ -1048,51 +612,26 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
     //double eta = iTrack->eta();                                                                                                                        
 
     // beam line at z of track, taking beam tilt into account                                                                                            
-
     double zBeam = iTrack->dz(bsP);//z0p of track along beam line w.r.t. beam z center                                                                   
     double xBeam = rbs->x0() + rbs->dxdz() * zBeam;//beam at z of track                                                                                  
     double yBeam = rbs->y0() + rbs->dydz() * zBeam;
     double z0p =  zBeam + bsP.z(); // z0p of track along beam line w.r.t. CMS z = 0                                                                      
     XYZPoint blP = XYZPoint( xBeam, yBeam, z0p );//point on beam line at z of track                                                                      
 
-    //xBS = xBeam;//improve                                                                                                                                
-    // yBS = yBeam;//beam tilt taken into account                                                                                                           
-
     double bcap = iTrack->dxy(blP);//impact parameter to beam                                                                                            
     double edca = iTrack->dxyError();
     double ebca = sqrt( edca*edca + bx*by );//round beam                                                                                                 
-    double sbca = bcap / ebca;//impact parameter significance                                                                                            
+    //double sbca = bcap / ebca;//impact parameter significance                                                                                            
 
-    // if( hp.hasValidHitInFirstPixelBarrel() &&                                                                                                         
-    //        hp.trackerLayersWithMeasurement() > 7 ) {                                                                                                  
-    /*if( hp.hasValidHitInPixelLayer(PixelSubdetector::PixelEndcap,2) && hp.trackerLayersWithMeasurement() > 7 ) {
-      if( pt > 4 ) {
-	h040->Fill( bcap*1E4 );//26 um in Oct 2011, 21 um Apr 2012                                                                                       
-	h041->Fill( edca*1E4 );
-	h042->Fill( sbca );//1.02 in 2011 reReco                                                                                                         
-      }
-
-      h043->Fill( logpt, ebca*1E4 );
-      if( abs(sbca) < 5 ) {
-      h044->Fill( logpt, sqrtpihalf*abs(bcap)*1E4 );
-      //	h045->Fill( logpt, sqrtpihalf*abs(sbca) );
-      }
-    }//long tracks
-    */
-
-    if( hp.trackerLayersWithMeasurement() < 7 ) continue;
+    if( hp.trackerLayersWithMeasurement() < 7 ) continue; // select only tracks that go into strips
 
     // transient track:    
     TransientTrack tTrack = theB->build(*iTrack);
     TrajectoryStateOnSurface initialTSOS = tTrack.innermostMeasurementState();
     double kap = tTrack.initialFreeState().transverseCurvature();                          // curvature of track
     rho = 1/kap;  
-    
-  
-    //--------------------------------------------------------------------------
+      
     //   Get the Pixel Hits from the track for the triplet
-    //--------------------------------------------------------------------------   
-
     // rec hits from track extra:
     if( iTrack->extra().isNull() ) continue;//next track
     if( ! iTrack->extra().isAvailable() ) continue;//next track
@@ -1130,8 +669,6 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
     const GeomDet * det2 = NULL;
     const GeomDet * det3 = NULL;
     const GeomDet * det4 = NULL;    
-
-    //**********
 
     double xPX2_r1 = 0;
     double yPX2_r1 = 0;
@@ -1185,29 +722,55 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	 irecHit != iTrack->recHitsEnd(); ++irecHit ) {
       DetId detId = (*irecHit)->geographicalId();                          // get detector 
       uint32_t subDet = detId.subdetId();                                  // get subdetector
-      // enum Detector { Tracker=1, Muon=2, Ecal=3, Hcal=4, Calo=5 };
-      if( detId.det() != 1 ){
-	cout << "rec hit ID = " << detId.det() << " not in tracker!?!?\n";
-	continue;
-      }
-      
       recHitVector.push_back( (*irecHit)->clone() );
             
       // build transient hit: 
-      
-#ifdef NEW_TRACKINGRECHITS
       auto tmprh = (*irecHit)->cloneForFit(*builder->geometry()->idToDet((**irecHit).geographicalId()));
       auto transRecHit = hitCloner.makeShared(tmprh, initialTSOS);
-      
-#else
-      TransientTrackingRecHit::RecHitPointer transRecHit = hitBuilder->build( &*(*irecHit), initialTSOS);
-#endif	 
-      
       myTTRHvec.push_back( transRecHit );
       coTTRHvec.push_back( transRecHit );
       
       if( ! (*irecHit)->isValid() ) continue;
-      
+
+      if( subDet == PixelSubdetector::PixelEndcap) {
+	int idisk=tTopo->pxfDisk(detId);
+	const SiPixelRecHit *pixhit = dynamic_cast<const SiPixelRecHit*>( &*(*irecHit) );
+	edm::Ref<edmNew::DetSetVector<SiPixelCluster>, SiPixelCluster> const & clust = pixhit->cluster();
+	if( idisk == 1 ) {
+	  layer1HasBadPixels = pixhit->hasBadPixels();
+	  layer1OnEdge = pixhit->isOnEdge();
+	  layer1Charge = clust->charge();
+	  layer1SizeX = clust->sizeX();
+	  layer1SizeY = clust->sizeY();
+	  layer1xmin = clust->minPixelRow();
+	  layer1xmax = clust->maxPixelRow();
+	  layer1ymin = clust->minPixelCol();
+	  layer1ymax = clust->maxPixelCol();
+	}
+	else if(idisk ==2){
+	  layer2HasBadPixels = pixhit->hasBadPixels();
+	  layer2OnEdge = pixhit->isOnEdge();
+	  layer2Charge = clust->charge();
+	  layer2SizeX = clust->sizeX();
+	  layer2SizeY = clust->sizeY();
+	  layer2xmin = clust->minPixelRow();
+	  layer2xmax = clust->maxPixelRow();
+	  layer2ymin = clust->minPixelCol();
+	  layer2ymax = clust->maxPixelCol();
+	}
+	else if(idisk ==3){
+	  layer3HasBadPixels = pixhit->hasBadPixels();
+	  layer3OnEdge = pixhit->isOnEdge();
+	  layer3Charge = clust->charge();
+	  layer3SizeX = clust->sizeX();
+	  layer3SizeY = clust->sizeY();
+	  layer3xmin = clust->minPixelRow();
+	  layer3xmax = clust->maxPixelRow();
+	  layer3ymin = clust->minPixelCol();
+	  layer3ymax = clust->maxPixelCol();
+        }
+      }
+
       double xloc = transRecHit->localPosition().x();       // 1st meas coord
       double yloc = transRecHit->localPosition().y();       // 2nd meas coord or zero
       double vxloc = transRecHit->localPositionError().xx();//covariance
@@ -1215,117 +778,26 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
       double gX = transRecHit->globalPosition().x();
       double gY = transRecHit->globalPosition().y();
       double gZ = transRecHit->globalPosition().z();
+
       if( transRecHit->canImproveWithTrack() ) {//use z from track to apply alignment
-	//if( idbg ) cout << "  try to improve\n";
 	TrajectoryStateOnSurface propTSOS = thePropagator->propagate( initialTSOS, transRecHit->det()->surface() );
 	if( propTSOS.isValid() ){
-
-#ifdef NEW_TRACKINGRECHITS
 	  auto preciseHit = hitCloner.makeShared(tmprh,propTSOS); //pre7  
-#else
-	  TransientTrackingRecHit::RecHitPointer preciseHit = transRecHit->clone(propTSOS);   // adding in trajetory with detector effects
-#endif
-	  //if( idbg ) cout << "  have preciseHit\n";
+
 	  xloc = preciseHit->localPosition().x();// 1st meas coord
 	  yloc = preciseHit->localPosition().y();// 2nd meas coord or zero
 
 	  vxloc = preciseHit->localPositionError().xx();//covariance
 	  vyloc = preciseHit->localPositionError().yy();//covariance
-	  if( idbg ) {
-	    //cout << "  improved hit in "   << subDet;
-	    //cout << setprecision(4);
-	    //cout << ", xloc from "         << transRecHit->localPosition().x();
-	    //cout << " to "                 << preciseHit->localPosition().x();
-	    //cout << ", yloc from "         << transRecHit->localPosition().y();
-	    //cout << " to "                 << preciseHit->localPosition().y();
-	    //cout << endl;
-	  }
 	  
 	  gX = preciseHit->globalPosition().x();
 	  gY = preciseHit->globalPosition().y();
 	  gZ = preciseHit->globalPosition().z();
-	  
-	}//valid propTSOS
-	else{
-	  if( idbg ) cout << "  propTSOS not valid\n";
 	}
       }//canImprove
       
-      // ======================================================================
-      //  Fill BPIX points
-      // ======================================================================
-      if(detTag == "bpix"){
-      
-	// PXB:      
-	if( subDet == PixelSubdetector::PixelBarrel ) {
-	  
-	  int ilay=tTopo->pxbLayer(detId);
-	  
-	  if( ilay == 1 ) {
-	    
-	    n1++;
-	    xPX1 = gX;
-	    yPX1 = gY;
-	    zPX1 = gZ;
-	    xpx1_l = xloc;
-	    xpy1_l = yloc;
-	    ePX1 = sqrt( vxloc );
-	    fPX1 = sqrt( vyloc );
-
-	    det1 = transRecHit->det();	    
-	  }//PXB1
-	  
-	  if( ilay == 2){
-	    n2++;
-	    xPX2 = gX;    // precise hit in CMS global coordinates
-	    yPX2 = gY;
-	    zPX2 = gZ;
-	    xpx2_l = xloc;  // precise hit in local coordinates (w.r.t. sensor center)
-	    xpy2_l = yloc;
-	    ePX2 = sqrt( vxloc );
-	    fPX2 = sqrt( vyloc );
-	    
-	    det2 = transRecHit->det();
-	  
-	    
-	  }//PXB2
-	  
-	  if( ilay == 3 ){
-	    
-	    n3++;
-	    xPX3 = gX;
-	    yPX3 = gY;
-	    zPX3 = gZ;
-	    xpx3_l = xloc;
-	    xpy3_l = yloc;
-	    ePX3 = sqrt( vxloc );
-	    fPX3 = sqrt( vyloc );
-
-	    det3 = transRecHit->det();
-	    
-	  }//PXB3
-	  if( ilay == 4 ){
-	    
-	    n4++;
-	    xPX4 = gX;
-	    yPX4 = gY;
-	    zPX4 = gZ;
-	    xpx4_l = xloc;
-	    xpy4_l = yloc;
-	    ePX4 = sqrt( vxloc );
-	    fPX4 = sqrt( vyloc );
-
-	    det4 = transRecHit->det();
-	    
-	    }//PXB4	  
-	}// Pixel
-
-      }// doBPIX
-
-      // ==============================================================
-      //  Fill FPIX points
       // ============================================================== 
-      else if(detTag == "fpix"){
+      if(detTag == "fpix"){
 	
 	// PXB:      
 	if( subDet == PixelSubdetector::PixelBarrel ) {
@@ -1395,7 +867,6 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	      const SiPixelRecHit *pixhit = dynamic_cast<const SiPixelRecHit*>( &*(*irecHit) );
 	      edm::Ref<edmNew::DetSetVector<SiPixelCluster>, SiPixelCluster> const & clust = pixhit->cluster();
 	    }
-
 
 	    if( ring == 1 ){
 	      n2_r1++;
@@ -1511,7 +982,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
       }
     
     }//loop rechits
-
+  
     //------------------------------------------------------------------------
     // refit the track:
     
@@ -1526,35 +997,9 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
       const Trajectory& refitTrajectory = refitTrajectoryCollection.front();
       // Trajectory.measurements:
       Trajectory::DataContainer refitTMs = refitTrajectory.measurements();
-      if( idbg ) {
-	//cout << "  refitTrajectory has " << refitTMs.size() <<" hits in subdet";
-      }
 
       pt_res_refit = refitTrajectory.geometricalInnermostState().globalMomentum().perp();
 
-      // hits in subDet:
-      
-      if( idbg ) {
-	for( Trajectory::DataContainer::iterator iTM = refitTMs.begin();
-	     iTM != refitTMs.end(); iTM++ ) {
-	  
-	  TransientTrackingRecHit::ConstRecHitPointer iTTRH = iTM->recHit();
-	  if( iTTRH->hit()->isValid() ){
-	    //cout << "  " << iTTRH->geographicalId().subdetId();
-	  }
-	}
-	//cout << endl;
-	
-	//cout << "         pt " << refitTrajectory.geometricalInnermostState().globalMomentum().perp();
-	//cout << ", eta " << refitTrajectory.geometricalInnermostState().globalMomentum().eta();
-	//cout << ", phi " << refitTrajectory.geometricalInnermostState().globalMomentum().barePhi()*wt;
-	//cout << ", at R " << refitTrajectory.geometricalInnermostState().globalPosition().perp();
-	//cout << ", z " << refitTrajectory.geometricalInnermostState().globalPosition().z();
-	//cout << ", phi " << refitTrajectory.geometricalInnermostState().globalPosition().barePhi()*wt;
-	//cout << endl;
-	
-      }//dbg
-      
       // trajectory residuals:
       
       for( Trajectory::DataContainer::iterator iTM = refitTMs.begin(); iTM != refitTMs.end(); iTM++ ) {
@@ -1655,7 +1100,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	
 	double lX = lp.x();
 	double lY = lp.y();
-
+      
 
 	//overwrite PXB global coordinates once more, using topology:
 
@@ -1826,10 +1271,15 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
       }//loop iTM
       
     }//refitted trajectory
-
+  
     //------------------------------------------------------------------------
     // 1-2-3 pixel triplet:
     
+    pxn1 = n1;
+    pxn2 = n2;
+    pxn3 = n3;
+    pxn4 = n4;
+
     if( n1*n2*n3 > 0 ) {
 
       {// let's open a scope, so we can redefine the variables further down
@@ -1898,419 +1348,30 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	x_local_error_3 = ePX3*1E4;
 	y_local_error_3 = fPX3*1E4;
       
-	// Add errors and pulls
-	double pulx1=0.;
-	double pulx2=0.;
-	double pulx3=0.;
-	double puly1=0.;
-	double puly2=0.;
-	double puly3=0.;
-	if(x_local_error_1!=0.0) pulx1 = residual_x_1/x_local_error_1;
-	if(x_local_error_2!=0.0) pulx2 = residual_x_2/x_local_error_2;
-	if(x_local_error_3!=0.0) pulx3 = residual_x_3/x_local_error_3;
-
-	if(y_local_error_1!=0.0) puly1 = residual_y_1/y_local_error_1;
-	if(y_local_error_2!=0.0) puly2 = residual_y_2/y_local_error_2;
-	if(y_local_error_3!=0.0) puly3 = residual_y_3/y_local_error_3;
-
 	// Fill Histograms for FPIX
 	if(detTag == "fpix"){
 	  
 	  if( pt > 0.8) {
             isTriplet = true;
-            numberOfTracksCount123++;
           }
 
   	  dx_res_1 = residual_x_2;
           dz_res_1 = residual_y_2;
 
+	  //actual residuals!!
 	  if(pt>4){
-
-	    hclusprob_fpix ->Fill(clusProb_FPix);
-	    h420f2_123_eta->Fill(iTrack->eta(), abs(residual_x_2));
-	    h421f2_123_eta->Fill(iTrack->eta(), abs(residual_y_2));
-
-	    h420f1_123->Fill( residual_x_1 ); 
-	    h421f1_123->Fill( residual_y_1 );
-	    
-	    h420f2_123->Fill( residual_x_2 );
-	    h421f2_123->Fill( residual_y_2 );
-	    
-	    h420f3_123->Fill( residual_x_3 );
-	    h421f3_123->Fill( residual_y_3 );
-	    
-	    if(n2_r1>0){
-	      h420f2_123_r1->Fill( residual_x_2_r1 );
-	      h421f2_123_r1->Fill( residual_y_2_r1 );
-	    }
-
-	    if(n2_r2>0){
-	      h420f2_123_r2->Fill( residual_x_2_r2 );
-	      h421f2_123_r2->Fill( residual_y_2_r2 );
-	    }
-
-	    // Fill errors
-	    h077f1_123->Fill( x_local_error_1 );
-	    h078f1_123->Fill( y_local_error_1 );
-	    
-	    h077f2_123->Fill( x_local_error_2 );
-	    h078f2_123->Fill( y_local_error_2 );
-	  
-	    h077f3_123->Fill( x_local_error_3 );
-	    h078f3_123->Fill( y_local_error_3 );
-
-	    // Fill pulls
-	    h079f1_123->Fill( pulx1 );
-	    h069f1_123->Fill( puly1 );
-
-	    h079f2_123->Fill( pulx2 );
-	    h069f2_123->Fill( puly2 );
-
-	    h079f3_123->Fill( pulx3 );
-	    h069f3_123->Fill( puly3 );
-
+	    printf("layer1dx %f for x %f ideal: %f",residual_x_2,xpx2_l,xl_ideal_1 );
+	    layer1dx = residual_x_2;
+	    layer1dz = residual_y_2;
 	  }
+	  
 	}
       
-	// Fill Histograms for BPIX
-	else if(detTag == "bpix"){
-	  
-	  if(pt>12){	  
-	    
-	    h420b1_123->Fill( residual_x_1 );
-	    h421b1_123->Fill( residual_y_1 );
-
-	    h420b2_123->Fill( residual_x_2 );
-	    h421b2_123->Fill( residual_y_2 );
-
-	    h420b3_123->Fill( residual_x_3 );
-	    h421b3_123->Fill( residual_y_3 );
-
-	    // Fill errors
-	    h077b1_123->Fill( x_local_error_1 );
-	    h078b1_123->Fill( y_local_error_1 );
-
-	    h077b2_123->Fill( x_local_error_2 );
-	    h078b2_123->Fill( y_local_error_2 );
-
-	    h077b3_123->Fill( x_local_error_3 );
-	    h078b3_123->Fill( y_local_error_3 );
-
-	    // Fill pulls
-	    h079b1_123->Fill( pulx1 );
-	    h069b1_123->Fill( puly1 );
-
-	    h079b2_123->Fill( pulx2 );
-	    h069b2_123->Fill( puly2 );
-
-	    h079b3_123->Fill( pulx3 );
-	    h069b3_123->Fill( puly3 );
-	  }
-	}
-	else{}
 
       }//triplet 
     }// three hits: 1-2-3
-
-    // 1-2-4 pixel triplet:
-    if( n1*n2*n4 > 0 ) {
-
-      {// let's open a scope, so we can redefine the variables further down
-       
-	// create points to feed helix
-	std::vector<double> p1 = {xPX1, yPX1, zPX1};
-	std::vector<double> p2 = {xPX2, yPX2, zPX2};
-	std::vector<double> p4 = {xPX4, yPX4, zPX4};
-	
-	std::vector<double> intersection1 = {};
-	std::vector<double> intersection2 = {};
-	std::vector<double> intersection4 = {};
-	
-	// Create helix from two points and curvature, return the intersection point in local coordinates
-	std::vector<double> IntersectionPointLocal_1 = Pixel_phase1::getIntersection(p2, p4, rho, det1, intersection1); 
-	std::vector<double> IntersectionPointLocal_2 = Pixel_phase1::getIntersection(p1, p4, rho, det2, intersection2);
-	std::vector<double> IntersectionPointLocal_4 = Pixel_phase1::getIntersection(p1, p2, rho, det4, intersection4);
-	
-	// Intersection point in local coordinates
-	xl_ideal_1 = IntersectionPointLocal_1[0];
-	yl_ideal_1 = IntersectionPointLocal_1[1];
-	
-	xl_ideal_2 = IntersectionPointLocal_2[0];
-	yl_ideal_2 = IntersectionPointLocal_2[1];
-	
-	xl_ideal_4 = IntersectionPointLocal_4[0];
-	yl_ideal_4 = IntersectionPointLocal_4[1];
-	
-	// Residuals with rechit and intersection point
-	residual_x_1= (xpx1_l - xl_ideal_1)*1E4;
-	residual_y_1= (xpy1_l - yl_ideal_1)*1E4;
-	
-	residual_x_2= (xpx2_l - xl_ideal_2)*1E4;
-	residual_y_2= (xpy2_l - yl_ideal_2)*1E4;
-	
-	residual_x_4= (xpx4_l - xl_ideal_4)*1E4;
-	residual_y_4= (xpy4_l - yl_ideal_4)*1E4;
-	
-	// Local errors for rechit
-	x_local_error_1 = ePX1*1E4;
-	y_local_error_1 = fPX1*1E4;
-	
-	x_local_error_2 = ePX2*1E4;
-	y_local_error_2 = fPX2*1E4;
-	
-	x_local_error_4 = ePX4*1E4;
-	y_local_error_4 = fPX4*1E4;
-      
-	// Add errors and pulls
-	double pulx1=0.;
-	double pulx2=0.;
-	double pulx4=0.;
-	double puly1=0.;
-	double puly2=0.;
-	double puly4=0.;
-	
-	if(x_local_error_1!=0.0) pulx1 = residual_x_1/x_local_error_1;
-	if(x_local_error_2!=0.0) pulx2 = residual_x_2/x_local_error_2;
-	if(x_local_error_4!=0.0) pulx4 = residual_x_4/x_local_error_4;
-
-	if(y_local_error_1!=0.0) puly1 = residual_y_1/y_local_error_1;
-	if(y_local_error_2!=0.0) puly2 = residual_y_2/y_local_error_2;
-	if(y_local_error_4!=0.0) puly4 = residual_y_4/y_local_error_4;
-
-	// Fill Histograms for FPIX
-	if(detTag == "fpix"){
-	  
-	  if( pt > 0.8) {
-            isTriplet = true;
-            numberOfTracksCount124++;
-          }
-
-	  if(pt>4){
-
-	    hclusprob_fpix ->Fill(clusProb_FPix);
-	    
-	    h420f1_124->Fill( residual_x_1 ); 
-	    h421f1_124->Fill( residual_y_1 );
-	    
-	    h420f2_124->Fill( residual_x_2 );
-	    h421f2_124->Fill( residual_y_2 );
-	    
-	    h420f4_124->Fill( residual_x_4 );
-	    h421f4_124->Fill( residual_y_4 );
-	    
-	    // Fill errors
-	    h077f1_124->Fill( x_local_error_1 );
-	    h078f1_124->Fill( y_local_error_1 );
-	    
-	    h077f2_124->Fill( x_local_error_2 );
-	    h078f2_124->Fill( y_local_error_2 );
-	  
-	    h077f4_124->Fill( x_local_error_4 );
-	    h078f4_124->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079f1_124->Fill( pulx1 );
-	    h069f1_124->Fill( puly1 );
-
-	    h079f2_124->Fill( pulx2 );
-	    h069f2_124->Fill( puly2 );
-
-	    h079f4_124->Fill( pulx4 );
-	    h069f4_124->Fill( puly4 );
-
-	  }
-	}
-      
-	// Fill Histograms for BPIX
-	else if(detTag == "bpix"){
-	  
-	  if(pt>12){	  
-	    
-	    h420b1_124->Fill( residual_x_1 );
-	    h421b1_124->Fill( residual_y_1 );
-
-	    h420b2_124->Fill( residual_x_2 );
-	    h421b2_124->Fill( residual_y_2 );
-
-	    h420b4_124->Fill( residual_x_4 );
-	    h421b4_124->Fill( residual_y_4 );
-
-	    // Fill errors
-	    h077b1_124->Fill( x_local_error_1 );
-	    h078b1_124->Fill( y_local_error_1 );
-
-	    h077b2_124->Fill( x_local_error_2 );
-	    h078b2_124->Fill( y_local_error_2 );
-
-	    h077b4_124->Fill( x_local_error_4 );
-	    h078b4_124->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079b1_124->Fill( pulx1 );
-	    h069b1_124->Fill( puly1 );
-
-	    h079b2_124->Fill( pulx2 );
-	    h069b2_124->Fill( puly2 );
-
-	    h079b4_124->Fill( pulx4 );
-	    h069b4_124->Fill( puly4 );
-	  }
-	}
-	else{}
-
-      }//triplet 
-      }// three hits: 1-3-4
-
-    if( n1*n3*n4 > 0 ) {
-
-      {// let's open a scope, so we can redefine the variables further down
-       
-	// create points to feed helix
-	std::vector<double> p1 = {xPX1, yPX1, zPX1};
-	std::vector<double> p3 = {xPX3, yPX3, zPX3};
-	std::vector<double> p4 = {xPX4, yPX4, zPX4};
-	
-	std::vector<double> intersection1 = {};
-	std::vector<double> intersection3 = {};
-	std::vector<double> intersection4 = {};
-	
-	// Create helix from two points and curvature, return the intersection point in local coordinates
-	std::vector<double> IntersectionPointLocal_1 = Pixel_phase1::getIntersection(p3, p4, rho, det1, intersection1); 
-	std::vector<double> IntersectionPointLocal_3 = Pixel_phase1::getIntersection(p1, p4, rho, det3, intersection3);
-	std::vector<double> IntersectionPointLocal_4 = Pixel_phase1::getIntersection(p1, p3, rho, det4, intersection4);
-	
-	// Intersection point in local coordinates
-	xl_ideal_1 = IntersectionPointLocal_1[0];
-	yl_ideal_1 = IntersectionPointLocal_1[1];
-	
-	xl_ideal_3 = IntersectionPointLocal_3[0];
-	yl_ideal_3 = IntersectionPointLocal_3[1];
-	
-	xl_ideal_4 = IntersectionPointLocal_4[0];
-	yl_ideal_4 = IntersectionPointLocal_4[1];
-	
-	// Residuals with rechit and intersection point
-	residual_x_1= (xpx1_l - xl_ideal_1)*1E4;
-	residual_y_1= (xpy1_l - yl_ideal_1)*1E4;
-	
-	residual_x_3= (xpx3_l - xl_ideal_3)*1E4;
-	residual_y_3= (xpy3_l - yl_ideal_3)*1E4;
-	
-	residual_x_4= (xpx4_l - xl_ideal_4)*1E4;
-	residual_y_4= (xpy4_l - yl_ideal_4)*1E4;
-	
-	// Local errors for rechit
-	x_local_error_1 = ePX1*1E4;
-	y_local_error_1 = fPX1*1E4;
-	
-	x_local_error_3 = ePX3*1E4;
-	y_local_error_3 = fPX3*1E4;
-	
-	x_local_error_4 = ePX4*1E4;
-	y_local_error_4 = fPX4*1E4;
-      
-	// Add errors and pulls
-	double pulx1=0.;
-	double pulx3=0.;
-	double pulx4=0.;
-	double puly1=0.;
-	double puly3=0.;
-	double puly4=0.;
-	
-	if(x_local_error_1!=0.0) pulx1 = residual_x_1/x_local_error_1;
-	if(x_local_error_3!=0.0) pulx3 = residual_x_3/x_local_error_3;
-	if(x_local_error_4!=0.0) pulx4 = residual_x_4/x_local_error_4;
-
-	if(y_local_error_1!=0.0) puly1 = residual_y_1/y_local_error_1;
-	if(y_local_error_3!=0.0) puly3 = residual_y_3/y_local_error_3;
-	if(y_local_error_4!=0.0) puly4 = residual_y_4/y_local_error_4;
-
-	// Fill Histograms for FPIX
-	if(detTag == "fpix"){
-	  
-	  if( pt > 0.8) {
-            isTriplet = true;
-            numberOfTracksCount134++;
-          }
-
-	  if(pt>4){
-
-	    hclusprob_fpix ->Fill(clusProb_FPix);
-	    
-	    h420f1_134->Fill( residual_x_1 ); 
-	    h421f1_134->Fill( residual_y_1 );
-	    
-	    h420f3_134->Fill( residual_x_3 );
-	    h421f3_134->Fill( residual_y_3 );
-	    
-	    h420f4_134->Fill( residual_x_4 );
-	    h421f4_134->Fill( residual_y_4 );
-	    
-	    // Fill errors
-	    h077f1_134->Fill( x_local_error_1 );
-	    h078f1_134->Fill( y_local_error_1 );
-	    
-	    h077f3_134->Fill( x_local_error_3 );
-	    h078f3_134->Fill( y_local_error_3 );
-	  
-	    h077f4_134->Fill( x_local_error_4 );
-	    h078f4_134->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079f1_134->Fill( pulx1 );
-	    h069f1_134->Fill( puly1 );
-
-	    h079f3_134->Fill( pulx3 );
-	    h069f3_134->Fill( puly3 );
-
-	    h079f4_134->Fill( pulx4 );
-	    h069f4_134->Fill( puly4 );
-
-	  }
-	}
-      
-	// Fill Histograms for BPIX
-	else if(detTag == "bpix"){
-	  
-	  if(pt>12){	  
-	    
-	    h420b1_134->Fill( residual_x_1 );
-	    h421b1_134->Fill( residual_y_1 );
-
-	    h420b3_134->Fill( residual_x_3 );
-	    h421b3_134->Fill( residual_y_3 );
-
-	    h420b4_134->Fill( residual_x_4 );
-	    h421b4_134->Fill( residual_y_4 );
-
-	    // Fill errors
-	    h077b1_134->Fill( x_local_error_1 );
-	    h078b1_134->Fill( y_local_error_1 );
-
-	    h077b3_134->Fill( x_local_error_3 );
-	    h078b3_134->Fill( y_local_error_3 );
-
-	    h077b4_134->Fill( x_local_error_4 );
-	    h078b4_134->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079b1_134->Fill( pulx1 );
-	    h069b1_134->Fill( puly1 );
-
-	    h079b3_134->Fill( pulx3 );
-	    h069b3_134->Fill( puly3 );
-
-	    h079b4_134->Fill( pulx4 );
-	    h069b4_134->Fill( puly4 );
-	  }
-	}
-	else{}
-
-      }//triplet 
-      }// three hits: 1-3-4
-
+    
     if( n2*n3*n4 > 0 ) {
-
       {// let's open a scope, so we can redefine the variables further down
        
 	// create points to feed helix
@@ -2398,22 +1459,6 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	x_local_error_4 = ePX4*1E4;
 	y_local_error_4 = fPX4*1E4;
       
-	// Add errors and pulls
-	double pulx2=0.;
-	double pulx3=0.;
-	double pulx4=0.;
-	double puly2=0.;
-	double puly3=0.;
-	double puly4=0.;
-	
-	if(x_local_error_2!=0.0) pulx2 = residual_x_2/x_local_error_2;
-	if(x_local_error_3!=0.0) pulx3 = residual_x_3/x_local_error_3;
-	if(x_local_error_4!=0.0) pulx4 = residual_x_4/x_local_error_4;
-
-	if(y_local_error_2!=0.0) puly2 = residual_y_2/y_local_error_2;
-	if(y_local_error_3!=0.0) puly3 = residual_y_3/y_local_error_3;
-	if(y_local_error_4!=0.0) puly4 = residual_y_4/y_local_error_4;
-
 	// Fill Histograms for FPIX
 	if(detTag == "fpix"){
 	  
@@ -2425,17 +1470,8 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
             pt_res_refit = -9999.;
           }
 
-	  pt_res = pt;
-          cluster_size_res = cluster_size_res_init;
-          hits_track = hp.numberOfValidTrackerHits();
-          hits_barrel = hp.numberOfValidPixelBarrelHits();
-          hits_endcap = hp.numberOfValidPixelEndcapHits();
-          ls_with_measure = hp.pixelBarrelLayersWithMeasurement();
-          ds_with_measure = hp.pixelEndcapLayersWithMeasurement();
-
 	  if( pt > 0.8) {
             isTriplet = true;
-            numberOfTracksCount234++;
           }
 
 	  dx_res_2 = residual_x_3;
@@ -2445,133 +1481,22 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	  dz_res_3 = residual_y_4;
 
 	  if(pt>4){
-	    //cout << residual_x_3 << endl;
-	    hclusprob_fpix ->Fill(clusProb_FPix);
-	    
-	    h420f3_234_eta->Fill(iTrack->eta(), abs(residual_x_3));
-	    h421f3_234_eta->Fill(iTrack->eta(), abs(residual_y_3));
+	    layer2dx = residual_x_3;
+            layer2dz = residual_y_3;
 
-	    h420f4_234_eta->Fill(iTrack->eta(), abs(residual_x_4));
-	    h421f4_234_eta->Fill(iTrack->eta(), abs(residual_y_4));
-
-	    h420f2_234->Fill( residual_x_2 ); 
-	    h421f2_234->Fill( residual_y_2 );
-	    
-	    h420f3_234->Fill( residual_x_3 );
-	    h421f3_234->Fill( residual_y_3 );
-	    
-	    h420f4_234->Fill( residual_x_4 );
-	    h421f4_234->Fill( residual_y_4 );
-
-	    if(n3_r1>0){
-	      h420f3_234_r1->Fill( residual_x_3_r1 );
-	      h421f3_234_r1->Fill( residual_y_3_r1 );
-	    }
-	    
-	    if(n4_r1>0){
-	      h420f4_234_r1->Fill( residual_x_4_r1 );
-	      h421f4_234_r1->Fill( residual_y_4_r1 );
-	    }
-
-	    if(n3_r2>0){
-	      h420f3_234_r2->Fill( residual_x_3_r2 );
-	      h421f3_234_r2->Fill( residual_y_3_r2 );
-	    }
-
-	    if(n4_r2>0){
-	      h420f4_234_r2->Fill( residual_x_4_r2 );
-	      h421f4_234_r2->Fill( residual_y_4_r2 );
-	    }
-
-	    // Fill errors
-	    h077f2_234->Fill( x_local_error_2 );
-	    h078f2_234->Fill( y_local_error_2 );
-	    
-	    h077f3_234->Fill( x_local_error_3 );
-	    h078f3_234->Fill( y_local_error_3 );
-	  
-	    h077f4_234->Fill( x_local_error_4 );
-	    h078f4_234->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079f2_234->Fill( pulx2 );
-	    h069f2_234->Fill( puly2 );
-
-	    h079f3_234->Fill( pulx3 );
-	    h069f3_234->Fill( puly3 );
-
-	    h079f4_234->Fill( pulx4 );
-	    h069f4_234->Fill( puly4 );
-
+            layer3dx = residual_x_4;
+            layer3dz = residual_y_4;
 	  }
 	}
       
-	// Fill Histograms for BPIX
-	else if(detTag == "bpix"){
-	  
-	  if(pt>12){	  
-	    
-	    h420b2_234->Fill( residual_x_2 );
-	    h421b2_234->Fill( residual_y_2 );
-
-	    h420b3_234->Fill( residual_x_3 );
-	    h421b3_234->Fill( residual_y_3 );
-
-	    h420b4_234->Fill( residual_x_4 );
-	    h421b4_234->Fill( residual_y_4 );
-
-	    // Fill errors
-	    h077b2_234->Fill( x_local_error_2 );
-	    h078b2_234->Fill( y_local_error_2 );
-
-	    h077b3_234->Fill( x_local_error_3 );
-	    h078b3_234->Fill( y_local_error_3 );
-
-	    h077b4_234->Fill( x_local_error_4 );
-	    h078b4_234->Fill( y_local_error_4 );
-	    
-	    // Fill pulls
-	    h079b2_234->Fill( pulx2 );
-	    h069b2_234->Fill( puly2 );
-
-	    h079b3_234->Fill( pulx3 );
-	    h069b3_234->Fill( puly3 );
-
-	    h079b4_234->Fill( pulx4 );
-	    h069b4_234->Fill( puly4 );
-	  }
-	}
 	else{}
 
       }//triplet 
-      }// three hits: 2-3-4
-
-    if(isTriplet) { // new cut for test here                                                                                                                                                                                                                                    
-      dx_resolution_study_1.push_back(dx_res_1);
-      dz_resolution_study_1.push_back(dz_res_1);
-      dx_resolution_study_2.push_back(dx_res_2);
-      dz_resolution_study_2.push_back(dz_res_2);
-      dx_resolution_study_3.push_back(dx_res_3);
-      dz_resolution_study_3.push_back(dz_res_3);
-      pt_resolution_study.push_back(pt_res);
-      pt_resolution_study_refit.push_back(pt_res_refit);
-      cluster_size_resolution_study.push_back(cluster_size_res);
-      hits_on_track_barrel.push_back(hits_barrel);
-      hits_on_track_barrel.push_back(hits_endcap);
-      hits_on_track_tracker.push_back(hits_track);
-      layers_with_measurement.push_back(ls_with_measure);
-      disks_with_measurement.push_back(ds_with_measure);
-    }
+    }// three hits: 2-3-4
 
   }// loop over tracks
   tree->Fill();
-
-  //cout << "numberOfTracksCount = " <<numberOfTracksCount << endl;
-  //cout << "numberOfTracksCount123 = " <<numberOfTracksCount123 << endl;
-  //cout << "numberOfTracksCount124 = " <<numberOfTracksCount123 << endl;
-  //cout << "numberOfTracksCount234 = " <<numberOfTracksCount123 << endl;
-  //cout << "numberOfTracksCount134 = " <<numberOfTracksCount123 << endl;
-
+  
 }//event
 //----------------------------------------------------------------------
 // method called just after ending the event loop:

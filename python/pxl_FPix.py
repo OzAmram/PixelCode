@@ -175,7 +175,8 @@ process.source = cms.Source("PoolSource",
 #'/store/data/Commissioning2018/ZeroBias/RAW/v1/000/313/025/00000/64AD95F5-8732-E811-9F3D-FA163E42C0B5.root'
 #'/store/data/Run2018D/ZeroBias/RAW/v1/000/324/410/00000/00739499-AFC9-3147-979D-413F734229EF.root'
 #'/store/express/Run2018D/ExpressPhysics/FEVT/Express-v1/000/324/318/00000/16238B89-A4D3-3542-A1BA-AC51A3F00DBD.root'
-'/store/data/Run2018D/SingleMuon/RAW/v1/000/324/318/00000/35BD0831-687D-194F-A07C-3E85CF60D2B1.root'
+#'/store/data/Run2018D/SingleMuon/RAW/v1/000/324/318/00000/35BD0831-687D-194F-A07C-3E85CF60D2B1.root'
+'/store/data/Run2018D/SingleMuon/RAW/v1/000/321/833/00000/9CD43785-D4A9-E811-893C-FA163EF8F660.root'
                                       ),
                             )
 #opt.dataTier = 'FEVT'
@@ -191,8 +192,8 @@ process.options = cms.untracked.PSet(
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v7', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_PromptLike_v7', '')
-
+#process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_PromptLike_v7', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
 #------------------ LOCAL CONDITIONS
 
 #process.GlobalTag.toGet = cms.VPSet(
