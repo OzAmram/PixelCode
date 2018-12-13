@@ -58,8 +58,8 @@
 // Datastructures - Keep all this in one file
 // This has to be a versioned file
 // It cannot go into separate files included from everywhere
-//#include "../interface/DataStructures_v6.h" // 2017 July 25, CMSSW_9_2_7
-#include "DPGAnalysis-SiPixelTools/PhaseIPixelNtuplizer/interface/DataStructures_v6.h"
+#include "DataStructures_v6.h" // 2017 July 25, CMSSW_9_2_7
+//#include "DPGAnalysis-SiPixelTools/PhaseIPixelNtuplizer/interface/DataStructures_v6.h"
 
 
 // SiPixelCoordinates: new class for plotting Phase 0/1 Geometry
