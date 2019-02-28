@@ -113,7 +113,6 @@ void Resid_filter::beginJob()
 
 void Resid_filter::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 {
-    const int run = iRun.run();
 
 
 }
@@ -354,8 +353,6 @@ void Resid_filter::checkAndSaveTrajMeasurementData
 
     // get track local parameters: momentum,direction,angles                                                                                   
     LocalTrajectoryParameters trajectoryParameters = trajStateOnSurface.localParameters();
-    auto trajectoryMomentum = trajectoryParameters.momentum();
-    LocalVector localTrackDirection = trajectoryMomentum / trajectoryMomentum.mag();
 
     //float alpha = atan2(localDir.z(), localDir.x());
     //float beta = atan2(localDir.z(), localDir.y());
@@ -608,13 +605,7 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     using namespace math;
     printf("analyze start \n");
 
-    const double pi = 4*atan(1);
-    const double wt = 180/pi;
-    const double twopi = 2*pi;
-    const double pihalf = 2*atan(1);
-    //const double sqrtpihalf = sqrt(pihalf);
 
-    //FOR NOW only do 1/3 events to get jobs to finish
 
 
 
@@ -685,7 +676,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     coord_.init(iSetup);
 
 
-    int idbg = 0;  // printout for the first few events
 
 
 
@@ -731,11 +721,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     theFitter->setHitCloner(&hitCloner);
     //#endif
 
-    //--------------------------------------------------------------------
-    // TrackPropagator:
-    edm::ESHandle<Propagator> prop;
-    iSetup.get<TrackingComponentsRecord>().get( "PropagatorWithMaterial", prop );
-    const Propagator* thePropagator = prop.product();
 
 
     //--------------------------------------------------------------------
@@ -771,9 +756,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
     //----------------------------------------------------------------------------
     // Tracks:
 
-    double sumpt = 0;
-    double sumq = 0;
-    Surface::GlobalPoint origin = Surface::GlobalPoint(0,0,0);
     for( TrackCollection::const_iterator iTrack = tracks->begin();
             iTrack != tracks->end(); ++iTrack ) {
 
@@ -782,7 +764,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         // calo: D = 1.3 m => pt = 0.74 GeV/c
 
         double pt = iTrack->pt();
-        double pp = iTrack->p();
 
         trkPt = pt;
         trkEta = iTrack->eta();
@@ -812,17 +793,14 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         //float rmax = 0.;
         //
         uint32_t innerDetId = 0;
-        uint32_t layer2_detid = 0;
         float rmin = 0.;
 
 
         // std::cout << " imod 0 "<< imod<< std::endl;
 
         edm::OwnVector<TrackingRecHit> recHitVector, recHitVectorNo1; // for seed
-        bool found_layer2 = false;
 
 
-        TrackingRecHit *layer2_hit;
 
 
         Trajectory::RecHitContainer coTTRHvec, coTTRHvecNo1; // for fit, constant
@@ -839,7 +817,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
                 irecHit != iTrack->recHitsEnd(); ++irecHit ) {
 
             DetId detId = (*irecHit)->geographicalId();
-            uint32_t subDet = detId.subdetId();
 
             // enum Detector { Tracker=1, Muon=2, Ecal=3, Hcal=4, Calo=5 };
             if( detId.det() != 1 ){
@@ -852,7 +829,7 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
             if (ilay == dropLayer){
                 printf("lay %i hit. Should have been dropped?? \n", ilay);
                 //skip_track = true;
-                //continue;
+                continue;
             }
             recHitVector.push_back( (*irecHit)->clone() );
 
@@ -871,7 +848,6 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
             double gX = transRecHit->globalPosition().x();
             double gY = transRecHit->globalPosition().y();
-            double gZ = transRecHit->globalPosition().z();
             float gR = sqrt( gX*gX + gY*gY );
             if( gR < rmin ) {
                 rmin = gR;

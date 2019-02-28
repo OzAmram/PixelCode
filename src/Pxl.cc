@@ -276,7 +276,6 @@ void Pixel::beginJob()
 
 void Pixel::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 {
-    const int run = iRun.run();
 
 
 }
@@ -299,9 +298,9 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
         //FOR NOW only do 1/3 events to get jobs to finish
 
         /*
-        if(myCounters::neve % 3 != 1){
-            //printf("Skipping event %i \n", myCounters::neve);
-            return;
+           if(myCounters::neve % 3 != 1){
+        //printf("Skipping event %i \n", myCounters::neve);
+        return;
         }
         */
 
@@ -362,16 +361,12 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
         iEvent.getByToken( t_offlineBeamSpot_, rbs );
 
         XYZPoint bsP = XYZPoint(0,0,0);
-        int ibs = 0;
 
         if( rbs.failedToGet() ) return;
         if( ! rbs.isValid() ) return;
 
-        ibs = 1;
         bsP = XYZPoint( rbs->x0(), rbs->y0(), rbs->z0() );
 
-        double bx = rbs->BeamWidthX();
-        double by = rbs->BeamWidthY();
 
         if( idbg ){
             cout << "beam spot x " << rbs->x0();
@@ -393,7 +388,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
         if( vertices.failedToGet() ) return;
         if( !vertices.isValid() ) return;
 
-        int nvertex = vertices->size();
 
         // need vertex global point for tracks
         // from #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
@@ -453,16 +447,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
         if( maxSumPt < 1 ) vtxP = vtxN;
 
 
-        double xBS = 0;
-        double yBS = 0;
-        if( ibs ) {
-            xBS = bsP.x();
-            yBS = bsP.y();
-        }
-        else {
-            xBS = vtxP.x();
-            yBS = vtxP.y();
-        }
 
         //--------------------------------------------------------------------
         // get a fitter to refit TrackCandidates, the same fitter as used in standard reconstruction:
@@ -533,8 +517,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
         //----------------------------------------------------------------------------
         // Tracks:
 
-        double sumpt = 0;
-        double sumq = 0;
         Surface::GlobalPoint origin = Surface::GlobalPoint(0,0,0);
         for( TrackCollection::const_iterator iTrack = tracks->begin();
                 iTrack != tracks->end(); ++iTrack ) {
@@ -544,13 +526,11 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             // calo: D = 1.3 m => pt = 0.74 GeV/c
 
             double pt = iTrack->pt();
-            double pp = iTrack->p();
 
             trkPt = pt;
             trkEta = iTrack->eta();
 
-            //if( pt < 0.75 ) continue;// curls up
-            //if( pt < 1.75 ) continue;// want sharper image
+            if( pt < 8 ) continue;// curls up
 
             //float tmp = abs(iTrack->dxy(vtxP))/iTrack->dxyError();
             //cout<<pt<<" "<<abs(iTrack->dxy(vtxP))<<" "<<iTrack->dxyError()<<" "<<tmp<<endl;
@@ -560,8 +540,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     (abs( iTrack->dxy(vtxP) ) > 5*iTrack->dxyError()) ) continue; // not prompt
 
 
-            sumpt += pt;
-            sumq += iTrack->charge();
 
             //double logpt = log(pt) / log(10);
 
@@ -593,19 +571,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
             // beam line at z of track, taking beam tilt into account
 
-            double zBeam = iTrack->dz(bsP);//z0p of track along beam line w.r.t. beam z center
-            double xBeam = rbs->x0() + rbs->dxdz() * zBeam;//beam at z of track
-            double yBeam = rbs->y0() + rbs->dydz() * zBeam;
-            double z0p =  zBeam + bsP.z(); // z0p of track along beam line w.r.t. CMS z = 0
-            XYZPoint blP = XYZPoint( xBeam, yBeam, z0p );//point on beam line at z of track
 
-            xBS = xBeam;//improve
-            yBS = yBeam;//beam tilt taken into account
 
-            double bcap = iTrack->dxy(blP);//impact parameter to beam
-            double edca = iTrack->dxyError();
-            double ebca = sqrt( edca*edca + bx*by );//round beam
-            //double sbca = bcap / ebca;//impact parameter significance
 
             if( hp.trackerLayersWithMeasurement() < 7 ) continue; // select only tracks which go into the strips
 
@@ -645,14 +612,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             double drd = dca * ( 0.5*kap*dca - 1.0 ); // 0.5 * kap * dca**2 - dca;
             double hkk = 0.5*kap*kap;
 
-            // track w.r.t. beam (cirmov):
 
-            double dp = -xBS*sf + yBS*cf + dca;
-            double dl = -xBS*cf - yBS*sf;
-            double sa = 2*dp + rinv * ( dp*dp + dl*dl );
-            double dcap = sa / ( 1 + sqrt(1 + rinv*sa) );// distance to beam
-            double ud = 1 + rinv*dca;
-            double phip = atan2( -rinv*xBS + ud*sf, rinv*yBS + ud*cf );//direction
 
             // track at R(PXB1), from FUNPHI, FUNLEN:
 
@@ -699,7 +659,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
             double xcrss[99];
             double ycrss[99];
-            double zcrss[99];
             int ncrss = 0;
 
             for( TrackerGeometry::DetContainer::const_iterator idet = pTG->dets().begin();
@@ -715,7 +674,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                    cout << ", ladder " << PXBDetId(mydetId).ladder();
                    cout << ", module " << PXBDetId(mydetId).module();
                    cout << ", at R1 " << (*idet)->position().perp();
-                   cout << ", F " << (*idet)->position().barePhi()*wt;
                    cout << ", z " << (*idet)->position().z();
                    cout << endl;
                    */
@@ -803,7 +761,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         if( hkk * ( r*r - dca*dca ) > erd ) s = pi/abs(kap) - s;
                     }
 
-                    zcrss[ncrss] = z0 + s*tan(dip); // z at r
                     ncrss++;
 
                 }//PXB1
@@ -823,7 +780,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             double xPXB1 = 0;
             double yPXB1 = 0;
             double zPXB1 = 0;
-            double uPXB1 = 0;
             //double vPXB1 = 0;
             //double fPXB1 = 0;
 
@@ -831,21 +787,16 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             double xPXB2 = 0;
             double yPXB2 = 0;
             double zPXB2 = 0;
-            double uPXB2 = 0;
-            double vPXB2 = 0;
 
             double xPXB3 = 0;
             double yPXB3 = 0;
             double zPXB3 = 0;
-            double uPXB3 = 0;
 
             double xPXB4 = 0;
             double yPXB4 = 0;
             double zPXB4 = 0;
-            //double uPXB4 = 0;
 
 
-            double vPXB3 = 0;
 
             int n1 = 0;
             int n2 = 0;
@@ -855,35 +806,11 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             double phiN2 = 0;
             double phiN3 = 0;
             double phiN4 = 0;
-            //double clch1 = 0;
-            //double clch3 = 0;
             //int ncol1 = 0;
             //int ncol2 = 0;
             //int ncol3 = 0;
             //double etaX1 = 0;
-            //double etaX3 = 0;
-            //double cogp1 = 0;
-            double cogp2 = 0;
-            double cogp3 = 0;
-            double xmid2 = 0;
-            double ymid2 = 0;
-            const GeomDet * det2 = NULL;
-            //int ilad2 = 0;
-            int zmin2 = 0;
-            int zmax2 = 0;
 
-            double xmid3 = 0;
-            double ymid3 = 0;
-            const GeomDet * det3 = NULL;
-            //int ilad3 = 0;
-            //int xmin3 = 0;
-            //int xmax3 = 0;
-            //int zmin3 = 0;
-            //int zmax3 = 0;
-
-            //int nTIB1 = 0;
-
-            // std::cout << " imod 0 "<< imod<< std::endl;
 
             edm::OwnVector<TrackingRecHit> recHitVector; // for seed
 
@@ -905,7 +832,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     continue;
                 }
 
-                int ilay = tTopo->pxbLayer(detId);//PXBDetId(detId).layer();
                 recHitVector.push_back( (*irecHit)->clone() );
 
                 int xmin = 0;
@@ -913,20 +839,17 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                 int ymin = 0;
                 int ymax = 0;
 
-                double cogp = 0;
 
                 //int icol = 0;
                 //int irow = 0;
                 int ncol = 0;
                 int nrow = 0;
-                double clch = 0;
 
                 //bool halfmod = 0;
 
                 double Q_f_X = 0.0;//first
                 double Q_l_X = 0.0;//last
                 double Q_m_X = 0.0;//middle
-                double etaX = 0;
 
                 double Q_f_Y = 0.0;//first
                 double Q_l_Y = 0.0;//last
@@ -948,7 +871,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     if( subDet == 1 ){ // PXB
 
                         int ilay = tTopo->pxbLayer(detId);//PXBDetId(detId).layer();
-                        int ilad = tTopo->pxbLadder(detId);//PXBDetId(detId).ladder();
 
                         if( idbg ) {
                             cout << "  layer  " << tTopo->pxbLayer(detId);// PXBDetId(detId).layer();
@@ -1084,11 +1006,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                             }//loop over pixels
 
-                            etaX = ( Q_f_X - Q_l_X ) / ( Q_f_X + Q_l_X + Q_m_X );
 
-                            cogp = xsum / qsum;
 
-                            clch = clust->charge();//electrons
                             /*icol = clust->minPixelCol();
                               irow = clust->minPixelRow();*/
                             ncol = clust->sizeY();
@@ -1159,12 +1078,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                 if( ! (*irecHit)->isValid() ) continue;
 
-                double xloc = transRecHit->localPosition().x();// 1st meas coord
-                double yloc = transRecHit->localPosition().y();// 2nd meas coord or zero
-                //double zloc = transRecHit->localPosition().z();// up, always zero, unused
 
-                double vxloc = transRecHit->localPositionError().xx();//covariance
-                double vyloc = transRecHit->localPositionError().yy();//covariance
 
                 double gX = transRecHit->globalPosition().x();
                 double gY = transRecHit->globalPosition().y();
@@ -1185,13 +1099,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                         auto preciseHit = hitCloner.makeShared(tmprh,propTSOS); //pre7
 
-                        //#else
-                        xloc = preciseHit->localPosition().x();// 1st meas coord
-                        yloc = preciseHit->localPosition().y();// 2nd meas coord or zero
-                        // zloc = preciseHit->localPosition().z();// up, always zero
 
-                        vxloc = preciseHit->localPositionError().xx();//covariance
-                        vyloc = preciseHit->localPositionError().yy();//covariance
 
 
                         gX = preciseHit->globalPosition().x();
@@ -1221,14 +1129,11 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                 double phiN = transRecHit->det()->surface().normalVector().barePhi();//normal vector
 
-                double xmid = transRecHit->det()->position().x();
-                double ymid = transRecHit->det()->position().y();
 
                 // PXB:
 
                 if( subDet == PixelSubdetector::PixelBarrel ) {
 
-                    double xpix = fmod( xloc+0.82, 0.01 );// xpix = 0..0.01
 
 
                     double df = phiN - gF;//normal vector vs position vector: inwards or outwards
@@ -1242,19 +1147,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
 
                     int ilay = tTopo->pxbLayer(detId);//PXBDetId(detId).layer();
-                    int ilad = tTopo->pxbLadder(detId);//PXBDetId(detId).ladder();
-                    int imod = tTopo->pxbModule(detId);//PXBDetId(detId).module();
-
-                    if( idbg ) {
-                        cout << "  xloc " << xloc;
-                        cout << ", cogp " << cogp;
-                        double cogx = (cogp + 0.5 - 80) * 0.01 - 0.0054;
-                        if( cogp < 79 ) cogx -= 0.01; // big pix
-                        if( cogp > 80 ) cogx += 0.01; // big pix
-                        cout << ", cogx " << cogx;
-                        cout << ", dx = " << cogx - xloc;
-                        cout << endl;
-                    }
 
 
                     if( ilay == 1 ) {
@@ -1262,38 +1154,16 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         xPXB1 = gX;
                         yPXB1 = gY;
                         zPXB1 = gZ;
-                        uPXB1 = xloc;
-                        //vPXB1 = yloc;
-                        //fPXB1 = sqrt( vyloc );
                         phiN1 = phiN;
-                        //clch1 = clch;
                         //ncol1 = ncol;
-                        //etaX1 = etaX;
-                        //cogp1 = cogp;
 
 
 
 
-                        // if(      ilad ==  5 ) halfmod = 1;
-                        // else if( ilad ==  6 ) halfmod = 1;
-                        // else if( ilad == 15 ) halfmod = 1;
-                        // else if( ilad == 16 ) halfmod = 1;
 
 
 
                         // my crossings:
-
-                        for( int icrss = 0; icrss < ncrss; ++icrss ){
-
-                            double fcrss = atan2( ycrss[icrss], xcrss[icrss] );
-                            double df = gF - fcrss;
-                            if( df > pi ) df -= twopi;
-                            else if( df < -pi ) df += twopi;
-                            double du = gR*df;
-                            double dz = gZ - zcrss[icrss];
-
-
-                        }//crss
 
                     }//PXB1
 
@@ -1303,18 +1173,9 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         xPXB2 = gX; // precise hit in CMS global coordinates
                         yPXB2 = gY;
                         zPXB2 = gZ;
-                        uPXB2 = xloc; // precise hit in local coordinates (w.r.t. sensor center)
-                        vPXB2 = yloc;
                         phiN2 = phiN;
                         //ncol2 = ncol;
-                        cogp2 = cogp;
-                        xmid2 = xmid; // middle of sensor in global CMS coordinates
-                        ymid2 = ymid;
-                        //ilad2 = ilad;
-                        zmin2 = ymin;
-                        zmax2 = ymax;
 
-                        det2 = transRecHit->det();
 
 
                     }//PXB2
@@ -1325,21 +1186,12 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         xPXB3 = gX;
                         yPXB3 = gY;
                         zPXB3 = gZ;
-                        uPXB3 = xloc;
-                        vPXB3 = yloc;
                         phiN3 = phiN;
-                        //clch3 = clch;
                         //ncol3 = ncol;
-                        //etaX3 = etaX;
-                        cogp3 = cogp;
-                        xmid3 = xmid; // middle of sensor in global CMS coordinates
-                        ymid3 = ymid;
-                        //ilad3 = ilad;
                         //xmax3 = xmax;
                         //zmin3 = ymin;
                         //zmax3 = ymax;
 
-                        det3 = transRecHit->det();
 
                     }//PXB3
                     if( ilay == 4 ){
@@ -1348,13 +1200,7 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         xPXB4 = gX;
                         yPXB4 = gY;
                         zPXB4 = gZ;
-                        //uPXB4 = xloc;
-                        //vPXB4 = yloc;
                         phiN4 = phiN;
-                        //clch4 = clch;
-                        //ncol4 = ncol;
-                        //etaX4 = etaX;
-                        //cogp4 = cogp;
 
 
                     }//PXB4
@@ -1452,8 +1298,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     if( jdbg ) cout << "  have combinedPredictedState\n";
 
                     //double R = combinedPredictedState.globalPosition().perp();
-                    double F = combinedPredictedState.globalPosition().barePhi();
-                    double Z = combinedPredictedState.globalPosition().z();
 
                     double xptch = 0;
                     double yptch = 0;
@@ -1711,383 +1555,19 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             //------------------------------------------------------------------------
             // 1-2-4 pixel triplet:
 
-            if( n1*n2*n4 > 0 ) {
-
-                { // let's open a scope, so we can redefine the variables further down
-
-                    if( jdbg ) cout << "  triplet 1+4 -> 2\n";
-
-                    double f2 = atan2( yPXB2, xPXB2 );//position angle in layer 2
-
-                    double ax = xPXB4 - xPXB1;
-                    double ay = yPXB4 - yPXB1;
-                    double aa = sqrt( ax*ax + ay*ay ); // from 1 to 4
-
-                    double xmid = 0.5 * ( xPXB1 + xPXB4 );
-                    double ymid = 0.5 * ( yPXB1 + yPXB4 );
-                    double bx = xPXB2 - xmid;
-                    double by = yPXB2 - ymid;
-                    double bb = sqrt( bx*bx + by*by ); // from mid point to point 2
-
-
-                    // Author: Johannes Gassner (15.11.1996)
-                    // Make track from 2 space points and kappa (cmz98/ftn/csmktr.f)
-                    // Definition of the Helix :
-
-                    // x( t ) = X0 + KAPPA^-1 * SIN( PHI0 + t )
-                    // y( t ) = Y0 - KAPPA^-1 * COS( PHI0 + t )          t > 0
-                    // z( t ) = Z0 + KAPPA^-1 * TAN( DIP ) * t
-
-                    // Center of the helix in the xy-projection:
-
-                    // X0 = + ( DCA - KAPPA^-1 ) * SIN( PHI0 )
-                    // Y0 = - ( DCA - KAPPA^-1 ) * COS( PHI0 )
-
-                    // Point 1 must be in the inner layer, 4 in the outer:
-
-                    double r1 = sqrt( xPXB1*xPXB1 + yPXB1*yPXB1 );
-                    double r4 = sqrt( xPXB4*xPXB4 + yPXB4*yPXB4 );
-
-                    //	cout << "!!!warn r1 = " << r1 << ", r4 = " << r4 << endl;
-
-                    if( r4-r1 < 2.0 ) cout << "warn r1 = " << r1 << ", r4 = " << r4 << endl;
-
-                    // Calculate the centre of the helix in xy-projection that
-                    // transverses the two spacepoints. The points with the same
-                    // distance from the two points are lying on a line.
-                    // LAMBDA is the distance between the point in the middle of
-                    // the two spacepoints and the centre of the helix.
-
-                    // we already have kap and rho = 1/kap
-
-                    double lam = sqrt( -0.25 +
-                            rho*rho / ( ( xPXB1 - xPXB4 )*( xPXB1 - xPXB4 ) + ( yPXB1 - yPXB4 )*( yPXB1 - yPXB4 ) ) );
-
-                    // There are two solutions, the sign of kap gives the information
-                    // which of them is correct:
-
-                    if( kap > 0 ) lam = -lam;
-
-                    // ( X0, Y0 ) is the centre of the circle
-                    // that describes the helix in xy-projection:
-
-                    double x0 =  0.5*( xPXB1 + xPXB4 ) + lam * ( -yPXB1 + yPXB4 );
-                    double y0 =  0.5*( yPXB1 + yPXB4 ) + lam * (  xPXB1 - xPXB4 );
-
-                    // Calculate theta:
-
-                    double num = ( yPXB4 - y0 ) * ( xPXB1 - x0 ) - ( xPXB4 - x0 ) * ( yPXB1 - y0 );
-                    double den = ( xPXB1 - x0 ) * ( xPXB4 - x0 ) + ( yPXB1 - y0 ) * ( yPXB4 - y0 );
-                    double tandip = kap * ( zPXB4 - zPXB1 ) / atan( num / den );
-                    double udip = atan(tandip);
-                    //double utet = pihalf - udip;
-
-                    // To get phi0 in the right interval one must distinguish
-                    // two cases with positve and negative kap:
-
-                    double uphi;
-                    if( kap > 0 ) uphi = atan2( -x0,  y0 );
-                    else          uphi = atan2(  x0, -y0 );
-
-                    // The distance of the closest approach DCA depends on the sign
-                    // of kappa:
-
-                    double udca;
-                    if( kap > 0 ) udca = rho - sqrt( x0*x0 + y0*y0 );
-                    else          udca = rho + sqrt( x0*x0 + y0*y0 );
-
-                    // angle from first hit to dca point:
-
-                    double dphi = atan( ( ( xPXB1 - x0 ) * y0 - ( yPXB1 - y0 ) * x0 )
-                            / ( ( xPXB1 - x0 ) * x0 + ( yPXB1 - y0 ) * y0 ) );
-
-                    double uz0 = zPXB1 + tandip * dphi * rho;
-
-
-                    // interpolate to middle hit:
-                    // cirmov
-                    // we already have rinv = -kap
-
-                    double cosphi = cos(uphi);
-                    double sinphi = sin(uphi);
-                    double dp = -xPXB2*sinphi + yPXB2*cosphi + udca;
-                    double dl = -xPXB2*cosphi - yPXB2*sinphi;
-                    double sa = 2*dp + rinv * ( dp*dp + dl*dl );
-                    double dca2 = sa / ( 1 + sqrt(1 + rinv*sa) );// distance to hit 2
-                    double ud = 1 + rinv*udca;
-                    double phi2 = atan2( -rinv*xPXB2 + ud*sinphi, rinv*yPXB2 + ud*cosphi );//direction
-
-                    double phiinc = phi2 - phiN2;//angle of incidence in rphi w.r.t. normal vector
-
-                    // phiN alternates inward/outward
-                    // reduce phiinc:
-
-                    if( phiinc > pihalf ) phiinc -= pi;
-                    else if( phiinc < -pihalf ) phiinc += pi;
-
-                    // arc length:
-
-                    double xx = xPXB2 + dca2 * sin(phi2); // point on track
-                    double yy = yPXB2 - dca2 * cos(phi2);
-
-                    double vx = xx - xmid2;//from module center
-                    double vy = yy - ymid2;
-                    double vv = sqrt( vx*vx + vy*vy );
-
-                    double f0 = uphi;//
-                    double kx = kap*xx;
-                    double ky = kap*yy;
-                    double kd = kap*udca;
-
-                    // Solve track equation for s:
-
-                    double dx = kx - (kd-1)*sin(f0);
-                    double dy = ky + (kd-1)*cos(f0);
-                    double ks = atan2( dx, -dy ) - f0;// turn angle
-
-                    // Limit to half-turn:
-
-                    if(      ks >  pi ) ks = ks - twopi;
-                    else if( ks < -pi ) ks = ks + twopi;
-
-                    double s = ks*rho; // signed
-                    double uz2 = uz0 + s*tandip; // track z at R2
-                    double dz2 = zPXB2 - uz2;
-
-                    Surface::GlobalPoint gp2( xx, yy, uz2 );
-                    Surface::LocalPoint lp2 = det2->toLocal( gp2 );
-
-                    if( idbg ) {
-                        std::cout <<"**** local  Point coord ****" <<std::endl;
-                        std::cout <<"gp2.x() "<< gp2.x() <<std::endl;
-                        std::cout <<"gp2.y() "<< gp2.y() <<std::endl;
-                        std::cout <<"gp2.z() "<< gp2.z() <<std::endl;
-
-                        std::cout <<"lp2.x() "<< lp2.x() <<std::endl;
-                        std::cout <<"lp2.y() "<< lp2.y() <<std::endl;
-                        std::cout <<"lp2.z() "<< lp2.z() <<std::endl;
-
-                        std::cout <<"  uPXB2 = xloc;  precise hit in local coordinates (w.r.t. sensor center)"<< uPXB2 <<std::endl;
-                        std::cout <<"  vPXB2 = yloc;precise hit in local coordinates (w.r.t. sensor center)" << vPXB2 <<std::endl;
-
-                    }
-                    // local x = phi
-                    // local y = z in barrel
-                    // local z = radial in barrel (thickness)
-
-                    //double xpix = fmod( uPXB2 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                    //double xpx2 = fmod( uPXB2 + 0.82, 0.02 ); // xpix = 0..0.02 reconstructed
-                    //double xpx1 = fmod( uPXB1 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                    //double xpx4 = fmod( uPXB4 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-
-                    //double dpix = fmod( uPXB2 + dca2 + 0.82, 0.01 ); // dpix = 0..0.01 predicted
-
-                    double vpix = fmod( vv, 0.01 ); // vpix = 0..0.01 predicted
-                    if( uPXB2 < 0 ) vpix = -vpix; // vv is unsigned distance from module center
-
-                    //double lpix = fmod( lp2.x() + 0.82, 0.01 ); // lpix = 0..0.01 predicted
-                    //double tpix = fmod( lp2.x() + 0.82, 0.02 ); // tpix = 0..0.02 predicted
-
-                    //double zpix = fmod( lp2.y() + 3.24, 0.015 ); // zpix = 0..0.015 predicted
-                    //double spix = fmod( lp2.y() + 3.24, 0.03  ); // spix = 0..0.03  predicted
-
-                    //int smin = zmin2%52; // 0..51 column along z
-                    //int smax = zmax2%52; // 0..51 column along z
-
-                    double cogx = (cogp2 + 0.5 - 80) * 0.01 - 0.0054; // Lorentz shift
-                    if( cogp2 < 79 ) cogx -= 0.01; // big pix
-                    if( cogp2 > 80 ) cogx += 0.01; // big pix
-
-                    double mpix = fmod( cogx + 0.82, 0.01 ); // mpix = 0..0.01 from cluster COG
-                    //double cogdx = cogx - lp2.x(); // residual
-
-                    // hybrid method:
-
-                    //double hybx = uPXB2; // template
-                    //if( mpix*1E4 < 20 ) hybx = cogx; // COG
-                    //if( mpix*1E4 > 75 ) hybx = cogx;
-                    //double hpix = fmod( hybx + 0.82, 0.01 ); // hpix = 0..0.01 from cluster hybrid method
-                    //double hybdx = hybx - lp2.x(); // residual
-
-                    /*bool halfmod = 0;
-                      if(      ilad2 ==  8 ) halfmod = 1;
-                      else if( ilad2 ==  9 ) halfmod = 1;
-                      else if( ilad2 == 24 ) halfmod = 1;
-                      else if( ilad2 == 25 ) halfmod = 1;
-                      */
-
-
-                    ////check for bias dot flip, unflipped, zplus,zminus,xplu,xminus combination
-
-
-
-
-
-                    // //////// Modules:1-8
-
-
-                    // profile of abs(dca) gives mean abs(dca):
-                    // mean of abs(Gauss) = 0.7979 * RMS = 1/sqrt(pi/2)
-                    // => rms = sqrt(pi/2) * mean of abs (sqrt(pi/2) = 1.2533)
-                    // point resolution = 1/sqrt(3/2) * triplet middle residual width
-                    // => sqrt(pi/2)*sqrt(2/3) = sqrt(pi/3) = 1.0233, almost one
-
-
-                    // pt bins:
-                    // uPXB2 = local x
-                    // vPXB2 = local z
-                    // low pt: material
-                }
-
-            }
-
 
             if (n3*n2*n4>0){
 
                 //------------------------------------------------------------------------
                 // triplet 3+4 -> 2:
 
-                {
-                    if( jdbg ) cout << "  triplet 3+4 -> 2\n";
-
-                    double f2 = atan2( yPXB2, xPXB2 );//position angle in layer 2
-
-                    double ax = xPXB4 - xPXB3;
-                    double ay = yPXB4 - yPXB3;
-                    double aa = sqrt( ax*ax + ay*ay ); // from 2 to 3
-
-                    double xmid = 0.5 * ( xPXB3 + xPXB4 );
-                    double ymid = 0.5 * ( yPXB3 + yPXB4 );
-                    double bx = xPXB2 - xmid;
-                    double by = yPXB2 - ymid;
-                    double bb = sqrt( bx*bx + by*by ); // from mid point to point 2
-
-                    // Calculate the centre of the helix in xy-projection that
-                    // transverses the two spacepoints. The points with the same
-                    // distance from the two points are lying on a line.
-                    // LAMBDA is the distance between the point in the middle of
-                    // the two spacepoints and the centre of the helix.
-
-                    // we already have kap and rho = 1/kap
-
-                    double lam = sqrt( -0.25 +
-                            rho*rho / ( ( xPXB3 - xPXB4 )*( xPXB3 - xPXB4 ) + ( yPXB3 - yPXB4 )*( yPXB3 - yPXB4 ) ) );
-
-                    // There are two solutions, the sign of kap gives the information
-                    // which of them is correct:
-
-                    if( kap > 0 ) lam = -lam;
-
-                    // ( X0, Y0 ) is the centre of the circle
-                    // that describes the helix in xy-projection:
-
-                    double x0 =  0.5*( xPXB3 + xPXB4 ) + lam * ( -yPXB3 + yPXB4 );
-                    double y0 =  0.5*( yPXB3 + yPXB4 ) + lam * (  xPXB3 - xPXB4 );
-
-                    // Calculate theta:
-
-                    double num = ( yPXB4 - y0 ) * ( xPXB3 - x0 ) - ( xPXB4 - x0 ) * ( yPXB3 - y0 );
-                    double den = ( xPXB3 - x0 ) * ( xPXB4 - x0 ) + ( yPXB3 - y0 ) * ( yPXB4 - y0 );
-                    double tandip = kap * ( zPXB4 - zPXB3 ) / atan( num / den );
-                    double udip = atan(tandip);
-                    //double utet = pihalf - udip;
-
-                    // To get phi0 in the right interval one must distinguish
-                    // two cases with positve and negative kap:
-
-                    double uphi;
-                    if( kap > 0 ) uphi = atan2( -x0,  y0 );
-                    else          uphi = atan2(  x0, -y0 );
-
-                    // The distance of the closest approach DCA depends on the sign
-                    // of kappa:
-
-                    double udca;
-                    if( kap > 0 ) udca = rho - sqrt( x0*x0 + y0*y0 );
-                    else          udca = rho + sqrt( x0*x0 + y0*y0 );
-
-                    // angle from first hit to dca point:
-
-                    double dphi = atan( ( ( xPXB3 - x0 ) * y0 - ( yPXB3 - y0 ) * x0 )
-                            / ( ( xPXB3 - x0 ) * x0 + ( yPXB3 - y0 ) * y0 ) );
-
-                    double uz0 = zPXB3 + tandip * dphi * rho;
-
-
-                    // extrapolate to inner hit:
-                    // cirmov
-                    // we already have rinv = -kap
-
-                    double cosphi = cos(uphi);
-                    double sinphi = sin(uphi);
-                    double dp = -xPXB2*sinphi + yPXB2*cosphi + udca;
-                    double dl = -xPXB2*cosphi - yPXB2*sinphi;
-                    double sa = 2*dp + rinv * ( dp*dp + dl*dl );
-                    double dca2 = sa / ( 1 + sqrt(1 + rinv*sa) );// distance to hit 1
-                    double ud = 1 + rinv*udca;
-                    double phi2 = atan2( -rinv*xPXB2 + ud*sinphi, rinv*yPXB2 + ud*cosphi );//direction
-
-                    double phiinc = phi2 - phiN2;//angle of incidence in rphi w.r.t. normal vector
-
-                    // phiN alternates inward/outward
-                    // reduce phiinc:
-
-                    if( phiinc > pihalf ) phiinc -= pi;
-                    else if( phiinc < -pihalf ) phiinc += pi;
-
-                    // arc length:
-
-                    double xx = xPXB2 + dca2 * sin(phi2); // point on track
-                    double yy = yPXB2 - dca2 * cos(phi2);
-
-                    double f0 = uphi;//
-                    double kx = kap*xx;
-                    double ky = kap*yy;
-                    double kd = kap*udca;
-
-                    // Solve track equation for s:
-
-                    double dx = kx - (kd-1)*sin(f0);
-                    double dy = ky + (kd-1)*cos(f0);
-                    double ks = atan2( dx, -dy ) - f0;// turn angle
-
-                    //---  Limit to half-turn:
-
-                    if(      ks >  pi ) ks = ks - twopi;
-                    else if( ks < -pi ) ks = ks + twopi;
-
-                    double s = ks*rho;// signed
-                    double uz2 = uz0 + s*tandip; //track z at R2
-                    double dz2 = zPXB2 - uz2;
-
-
-
-                    // residual profiles: alignment check
-
-
-                    // profile of abs(dca) gives mean abs(dca):
-                    // mean of abs(Gauss) = 0.7979 * RMS = 1/sqrt(pi/2)
-                    // => rms = sqrt(pi/2) * mean of abs (sqrt(pi/2) = 1.2533)
-                    // point resolution = 1/sqrt(3/2) * triplet middle residual width
-                    // => sqrt(pi/2)*sqrt(2/3) = sqrt(pi/3) = 1.0233, almost one
-
-                }
 
                 // 2 + 3 => 4
                 {
                     if( jdbg ) cout << "  triplet 2+3 -> 4\n";
 
-                    double f4 = atan2( yPXB4, xPXB4 );//position angle in layer 4
 
-                    double ax = xPXB3 - xPXB2;
-                    double ay = yPXB3 - yPXB2;
-                    double aa = sqrt( ax*ax + ay*ay ); // from 2 to 3
 
-                    double xmid = 0.5 * ( xPXB2 + xPXB3 );
-                    double ymid = 0.5 * ( yPXB2 + yPXB3 );
-                    double bx = xPXB4 - xmid;
-                    double by = yPXB4 - ymid;
-                    double bb = sqrt( bx*bx + by*by ); // from mid point to point 4
 
                     // Calculate the centre of the helix in xy-projection that
                     // transverses the two spacepoints. The points with the same
@@ -2116,8 +1596,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     double num = ( yPXB3 - y0 ) * ( xPXB2 - x0 ) - ( xPXB3 - x0 ) * ( yPXB2 - y0 );
                     double den = ( xPXB2 - x0 ) * ( xPXB3 - x0 ) + ( yPXB2 - y0 ) * ( yPXB3 - y0 );
                     double tandip = kap * ( zPXB3 - zPXB2 ) / atan( num / den );
-                    double udip = atan(tandip);
-                    //double utet = pihalf - udip;
 
                     // To get phi0 in the right interval one must distinguish
                     // two cases with positve and negative kap:
@@ -2203,17 +1681,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                         if( jdbg ) cout << "  triplet 2+4 -> 3\n";
 
-                        double f3 = atan2( yPXB3, xPXB3 );//position angle in layer 3
 
-                        double ax = xPXB4 - xPXB2;
-                        double ay = yPXB4 - yPXB2;
-                        double aa = sqrt( ax*ax + ay*ay ); // from 2 to 4
 
-                        double xmid = 0.5 * ( xPXB2 + xPXB4 );
-                        double ymid = 0.5 * ( yPXB2 + yPXB4 );
-                        double bx = xPXB3 - xmid;
-                        double by = yPXB3 - ymid;
-                        double bb = sqrt( bx*bx + by*by ); // from mid point to point 3
 
 
                         // Author: Johannes Gassner (15.11.1996)
@@ -2265,8 +1734,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double num = ( yPXB4 - y0 ) * ( xPXB2 - x0 ) - ( xPXB4 - x0 ) * ( yPXB2 - y0 );
                         double den = ( xPXB2 - x0 ) * ( xPXB4 - x0 ) + ( yPXB2 - y0 ) * ( yPXB4 - y0 );
                         double tandip = kap * ( zPXB4 - zPXB2 ) / atan( num / den );
-                        double udip = atan(tandip);
-                        //double utet = pihalf - udip;
 
                         // To get phi0 in the right interval one must distinguish
                         // two cases with positve and negative kap:
@@ -2316,9 +1783,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double xx = xPXB3 + dca3 * sin(phi3); // point on track
                         double yy = yPXB3 - dca3 * cos(phi3);
 
-                        double vx = xx - xmid3;//from module center
-                        double vy = yy - ymid3;
-                        double vv = sqrt( vx*vx + vy*vy );
 
                         double f0 = uphi;//
                         double kx = kap*xx;
@@ -2340,70 +1804,14 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double uz3 = uz0 + s*tandip; // track z at R3
                         double dz3 = zPXB3 - uz3;
 
-                        Surface::GlobalPoint gp3( xx, yy, uz3 );
-                        Surface::LocalPoint lp3 = det3->toLocal( gp3 );
 
-                        if( idbg ) {
-                            std::cout <<"**** local  Point coord ****" <<std::endl;
-                            std::cout <<"gp3.x() "<< gp3.x() <<std::endl;
-                            std::cout <<"gp3.y() "<< gp3.y() <<std::endl;
-                            std::cout <<"gp3.z() "<< gp3.z() <<std::endl;
-
-                            std::cout <<"lp3.x() "<< lp3.x() <<std::endl;
-                            std::cout <<"lp3.y() "<< lp3.y() <<std::endl;
-                            std::cout <<"lp3.z() "<< lp3.z() <<std::endl;
-
-                            std::cout <<"  uPXB3 = xloc;  precise hit in local coordinates (w.r.t. sensor center)"<< uPXB3 <<std::endl;
-                            std::cout <<"  vPXB3 = yloc;precise hit in local coordinates (w.r.t. sensor center)" << vPXB3 <<std::endl;
-
-                        }
-                        // local x = phi
-                        // local y = z in barrel
-                        // local z = radial in barrel (thickness)
-
-                        //double xpix = fmod( uPXB3 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                        //double xpx3 = fmod( uPXB3 + 0.82, 0.02 ); // xpix = 0..0.02 reconstructed
-                        //double xpx2 = fmod( uPXB2 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                        //double xpx4 = fmod( uPXB4 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-
-                        //double dpix = fmod( uPXB3 + dca3 + 0.82, 0.01 ); // dpix = 0..0.01 predicted
-
-                        double vpix = fmod( vv, 0.01 ); // vpix = 0..0.01 predicted
-                        if( uPXB3 < 0 ) vpix = -vpix; // vv is unsigned distance from module center
-
-                        double lpix = fmod( lp3.x() + 0.82, 0.01 ); // lpix = 0..0.01 predicted
-                        //double tpix = fmod( lp3.x() + 0.82, 0.02 ); // tpix = 0..0.02 predicted
-
-                        //double zpix = fmod( lp3.y() + 3.24, 0.015 ); // zpix = 0..0.015 predicted
-                        //double spix = fmod( lp3.y() + 3.24, 0.03  ); // spix = 0..0.03  predicted
-
-                        //int smin = zmin3%52; // 0..51 column along z
-                        //int smax = zmax3%52; // 0..51 column along z
-
-                        double cogx = (cogp3 + 0.5 - 80) * 0.01 - 0.0054; // Lorentz shift
-                        if( cogp3 < 79 ) cogx -= 0.01; // big pix
-                        if( cogp3 > 80 ) cogx += 0.01; // big pix
-
-                        double mpix = fmod( cogx + 0.82, 0.01 ); // mpix = 0..0.01 from cluster COG
-                        double cogdx = cogx - lp3.x(); // residual
 
                         layer3dx = dca3 * 1E4;
                         layer3dz = dz3 * 1E4;
 
                         // hybrid method:
 
-                        //double hybx = uPXB3; // template
-                        //if( mpix*1E4 < 20 ) hybx = cogx; // COG
-                        //if( mpix*1E4 > 75 ) hybx = cogx;
-                        //double hpix = fmod( hybx + 0.82, 0.01 ); // hpix = 0..0.01 from cluster hybrid method
-                        //double hybdx = hybx - lp3.x(); // residual
 
-                        /*bool halfmod = 0;
-                          if(      ilad3 ==  8 ) halfmod = 1;
-                          else if( ilad3 ==  9 ) halfmod = 1;
-                          else if( ilad3 == 24 ) halfmod = 1;
-                          else if( ilad3 == 25 ) halfmod = 1;
-                          */
 
                         // residual profiles: alignment check
 
@@ -2416,124 +1824,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
 
 
-                // triplet 1+2 -> 4:
-                if( n1*n2*n4 > 0 ) {
-                    {
-                        if( jdbg ) cout << "  triplet 1+2 -> 4\n";
-
-                        double f4 = atan2( yPXB4, xPXB4 );//position angle in layer 4
-
-                        double ax = xPXB2 - xPXB1;
-                        double ay = yPXB2 - yPXB1;
-                        double aa = sqrt( ax*ax + ay*ay ); // from 1 to 2
-
-                        double xmid = 0.5 * ( xPXB1 + xPXB2 );
-                        double ymid = 0.5 * ( yPXB1 + yPXB2 );
-                        double bx = xPXB4 - xmid;
-                        double by = yPXB4 - ymid;
-                        double bb = sqrt( bx*bx + by*by ); // from mid point to point 3
-
-                        // Calculate the centre of the helix in xy-projection that
-                        // transverses the two spacepoints. The points with the same
-                        // distance from the two points are lying on a line.
-                        // LAMBDA is the distance between the point in the middle of
-                        // the two spacepoints and the centre of the helix.
-
-                        // we already have kap and rho = 1/kap
-
-                        double lam = sqrt( -0.25 +
-                                rho*rho / ( ( xPXB1 - xPXB2 )*( xPXB1 - xPXB2 ) + ( yPXB1 - yPXB2 )*( yPXB1 - yPXB2 ) ) );
-
-                        // There are two solutions, the sign of kap gives the information
-                        // which of them is correct:
-
-                        if( kap > 0 ) lam = -lam;
-
-                        // ( X0, Y0 ) is the centre of the circle
-                        // that describes the helix in xy-projection:
-
-                        double x0 =  0.5*( xPXB1 + xPXB2 ) + lam * ( -yPXB1 + yPXB2 );
-                        double y0 =  0.5*( yPXB1 + yPXB2 ) + lam * (  xPXB1 - xPXB2 );
-
-                        // Calculate theta:
-
-                        double num = ( yPXB2 - y0 ) * ( xPXB1 - x0 ) - ( xPXB2 - x0 ) * ( yPXB1 - y0 );
-                        double den = ( xPXB1 - x0 ) * ( xPXB2 - x0 ) + ( yPXB1 - y0 ) * ( yPXB2 - y0 );
-                        double tandip = kap * ( zPXB2 - zPXB1 ) / atan( num / den );
-                        double udip = atan(tandip);
-                        //double utet = pihalf - udip;
-
-                        // To get phi0 in the right interval one must distinguish
-                        // two cases with positve and negative kap:
-
-                        double uphi;
-                        if( kap > 0 ) uphi = atan2( -x0,  y0 );
-                        else          uphi = atan2(  x0, -y0 );
-
-                        // The distance of the closest approach DCA depends on the sign
-                        // of kappa:
-
-                        double udca;
-                        if( kap > 0 ) udca = rho - sqrt( x0*x0 + y0*y0 );
-                        else          udca = rho + sqrt( x0*x0 + y0*y0 );
-
-                        // angle from first hit to dca point:
-
-                        double dphi = atan( ( ( xPXB1 - x0 ) * y0 - ( yPXB1 - y0 ) * x0 )
-                                / ( ( xPXB1 - x0 ) * x0 + ( yPXB1 - y0 ) * y0 ) );
-
-                        double uz0 = zPXB1 + tandip * dphi * rho;
-
-
-                        // extrapolate to outer hit:
-                        // cirmov
-                        // we already have rinv = -kap
-
-                        double cosphi = cos(uphi);
-                        double sinphi = sin(uphi);
-                        double dp = -xPXB4*sinphi + yPXB4*cosphi + udca;
-                        double dl = -xPXB4*cosphi - yPXB4*sinphi;
-                        double sa = 2*dp + rinv * ( dp*dp + dl*dl );
-                        double dca4 = sa / ( 1 + sqrt(1 + rinv*sa) );// distance to hit 4
-                        double ud = 1 + rinv*udca;
-                        double phi4 = atan2( -rinv*xPXB4 + ud*sinphi, rinv*yPXB4 + ud*cosphi );//track direction
-
-                        double phiinc = phi4 - phiN4;//angle of incidence in rphi w.r.t. normal vector
-
-                        // phiN alternates inward/outward
-                        // reduce phiinc:
-
-                        if( phiinc > pihalf ) phiinc -= pi;
-                        else if( phiinc < -pihalf ) phiinc += pi;
-
-                        // arc length:
-
-                        double xx = xPXB4 + dca4 * sin(phi4); // point on track
-                        double yy = yPXB4 - dca4 * cos(phi4);
-
-                        double f0 = uphi;//
-                        double kx = kap*xx;
-                        double ky = kap*yy;
-                        double kd = kap*udca;
-
-                        // Solve track equation for s:
-
-                        double dx = kx - (kd-1)*sin(f0);
-                        double dy = ky + (kd-1)*cos(f0);
-                        double ks = atan2( dx, -dy ) - f0;// turn angle
-
-                        //---  Limit to half-turn:
-
-                        if(      ks >  pi ) ks = ks - twopi;
-                        else if( ks < -pi ) ks = ks + twopi;
-
-                        double s = ks*rho;// signed
-                        double uz4 = uz0 + s*tandip; //track z at R4
-                        double dz4 = zPXB4 - uz4;
-
-                    }
-                    ////END PXB4
-                }
 
 
                 //------------------------------------------------------------------------
@@ -2544,31 +1834,9 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 
                         if( jdbg ) cout << "  triplet 1+3 -> 2\n";
 
-                        double f2 = atan2( yPXB2, xPXB2 );//position angle in layer 2
-
-                        double ax = xPXB3 - xPXB1;
-                        double ay = yPXB3 - yPXB1;
-                        double aa = sqrt( ax*ax + ay*ay ); // from 1 to 3
-
-                        double xmid = 0.5 * ( xPXB1 + xPXB3 );
-                        double ymid = 0.5 * ( yPXB1 + yPXB3 );
-                        double bx = xPXB2 - xmid;
-                        double by = yPXB2 - ymid;
-                        double bb = sqrt( bx*bx + by*by ); // from mid point to point 2
 
 
-                        // Author: Johannes Gassner (15.11.1996)
-                        // Make track from 2 space points and kappa (cmz98/ftn/csmktr.f)
-                        // Definition of the Helix :
 
-                        // x( t ) = X0 + KAPPA^-1 * SIN( PHI0 + t )
-                        // y( t ) = Y0 - KAPPA^-1 * COS( PHI0 + t )          t > 0
-                        // z( t ) = Z0 + KAPPA^-1 * TAN( DIP ) * t
-
-                        // Center of the helix in the xy-projection:
-
-                        // X0 = + ( DCA - KAPPA^-1 ) * SIN( PHI0 )
-                        // Y0 = - ( DCA - KAPPA^-1 ) * COS( PHI0 )
 
                         // Point 1 must be in the inner layer, 3 in the outer:
 
@@ -2606,8 +1874,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double num = ( yPXB3 - y0 ) * ( xPXB1 - x0 ) - ( xPXB3 - x0 ) * ( yPXB1 - y0 );
                         double den = ( xPXB1 - x0 ) * ( xPXB3 - x0 ) + ( yPXB1 - y0 ) * ( yPXB3 - y0 );
                         double tandip = kap * ( zPXB3 - zPXB1 ) / atan( num / den );
-                        double udip = atan(tandip);
-                        //double utet = pihalf - udip;
 
                         // To get phi0 in the right interval one must distinguish
                         // two cases with positve and negative kap:
@@ -2657,9 +1923,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double xx = xPXB2 + dca2 * sin(phi2); // point on track
                         double yy = yPXB2 - dca2 * cos(phi2);
 
-                        double vx = xx - xmid2;//from module center
-                        double vy = yy - ymid2;
-                        double vv = sqrt( vx*vx + vy*vy );
 
                         double f0 = uphi;//
                         double kx = kap*xx;
@@ -2681,66 +1944,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                         double uz2 = uz0 + s*tandip; // track z at R2
                         double dz2 = zPXB2 - uz2;
 
-                        Surface::GlobalPoint gp2( xx, yy, uz2 );
-                        Surface::LocalPoint lp2 = det2->toLocal( gp2 );
 
-                        if( idbg ) {
-                            std::cout <<"**** local  Point coord ****" <<std::endl;
-                            std::cout <<"gp2.x() "<< gp2.x() <<std::endl;
-                            std::cout <<"gp2.y() "<< gp2.y() <<std::endl;
-                            std::cout <<"gp2.z() "<< gp2.z() <<std::endl;
 
-                            std::cout <<"lp2.x() "<< lp2.x() <<std::endl;
-                            std::cout <<"lp2.y() "<< lp2.y() <<std::endl;
-                            std::cout <<"lp2.z() "<< lp2.z() <<std::endl;
-
-                            std::cout <<"  uPXB2 = xloc;  precise hit in local coordinates (w.r.t. sensor center)"<< uPXB2 <<std::endl;
-                            std::cout <<"  vPXB2 = yloc;precise hit in local coordinates (w.r.t. sensor center)" << vPXB2 <<std::endl;
-
-                        }
-                        // local x = phi
-                        // local y = z in barrel
-                        // local z = radial in barrel (thickness)
-
-                        double xpix = fmod( uPXB2 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                        double xpx2 = fmod( uPXB2 + 0.82, 0.02 ); // xpix = 0..0.02 reconstructed
-                        double xpx1 = fmod( uPXB1 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-                        double xpx3 = fmod( uPXB3 + 0.82, 0.01 ); // xpix = 0..0.01 reconstructed
-
-                        //double dpix = fmod( uPXB2 + dca2 + 0.82, 0.01 ); // dpix = 0..0.01 predicted
-
-                        double vpix = fmod( vv, 0.01 ); // vpix = 0..0.01 predicted
-                        if( uPXB2 < 0 ) vpix = -vpix; // vv is unsigned distance from module center
-
-                        double lpix = fmod( lp2.x() + 0.82, 0.01 ); // lpix = 0..0.01 predicted
-                        double tpix = fmod( lp2.x() + 0.82, 0.02 ); // tpix = 0..0.02 predicted
-
-                        double zpix = fmod( lp2.y() + 3.24, 0.015 ); // zpix = 0..0.015 predicted
-                        double spix = fmod( lp2.y() + 3.24, 0.03  ); // spix = 0..0.03  predicted
-
-                        int smin = zmin2%52; // 0..51 column along z
-                        int smax = zmax2%52; // 0..51 column along z
-
-                        double cogx = (cogp2 + 0.5 - 80) * 0.01 - 0.0054; // Lorentz shift
-                        if( cogp2 < 79 ) cogx -= 0.01; // big pix
-                        if( cogp2 > 80 ) cogx += 0.01; // big pix
-
-                        double mpix = fmod( cogx + 0.82, 0.01 ); // mpix = 0..0.01 from cluster COG
-                        double cogdx = cogx - lp2.x(); // residual
-
-                        // hybrid method:
-
-                        double hybx = uPXB2; // template
-                        if( mpix*1E4 < 20 ) hybx = cogx; // COG
-                        if( mpix*1E4 > 75 ) hybx = cogx;
-                        //double hpix = fmod( hybx + 0.82, 0.01 ); // hpix = 0..0.01 from cluster hybrid method
-                        double hybdx = hybx - lp2.x(); // residual
-
-                        // bool halfmod = 0;
-                        // if(      ilad2 ==  8 ) halfmod = 1;
-                        // else if( ilad2 ==  9 ) halfmod = 1;
-                        // else if( ilad2 == 24 ) halfmod = 1;
-                        // else if( ilad2 == 25 ) halfmod = 1;
                         layer2dx = dca2*1E4;
                         layer2dz = dz2*1E4;
 
@@ -2759,17 +1964,8 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                 {
                     if( jdbg ) cout << "  triplet 3+2 -> 1\n";
 
-                    double f1 = atan2( yPXB1, xPXB1 );//position angle in layer 1
 
-                    double ax = xPXB3 - xPXB2;
-                    double ay = yPXB3 - yPXB2;
-                    double aa = sqrt( ax*ax + ay*ay ); // from 2 to 3
 
-                    double xmid = 0.5 * ( xPXB2 + xPXB3 );
-                    double ymid = 0.5 * ( yPXB2 + yPXB3 );
-                    double bx = xPXB1 - xmid;
-                    double by = yPXB1 - ymid;
-                    double bb = sqrt( bx*bx + by*by ); // from mid point to point 1
 
                     // Calculate the centre of the helix in xy-projection that
                     // transverses the two spacepoints. The points with the same
@@ -2798,8 +1994,6 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
                     double num = ( yPXB3 - y0 ) * ( xPXB2 - x0 ) - ( xPXB3 - x0 ) * ( yPXB2 - y0 );
                     double den = ( xPXB2 - x0 ) * ( xPXB3 - x0 ) + ( yPXB2 - y0 ) * ( yPXB3 - y0 );
                     double tandip = kap * ( zPXB3 - zPXB2 ) / atan( num / den );
-                    double udip = atan(tandip);
-                    //double utet = pihalf - udip;
 
                     // To get phi0 in the right interval one must distinguish
                     // two cases with positve and negative kap:
