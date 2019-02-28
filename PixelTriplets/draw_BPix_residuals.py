@@ -12,7 +12,7 @@ def outputResid(h, outputName):
     c.Print(outputName)
     return True
 
-def getHist(tree, var, name, cut, nBins = 50, binLow = -300., binHigh = 300.):
+def getHist(tree, var, name, cut, nBins = 30, binLow = -300., binHigh = 300.):
     h = TH1F(name, name, nBins, binLow, binHigh)
     tree.Draw("%s>>%s" %(var, name),cut)
     h = gDirectory.Get(name)
@@ -48,26 +48,40 @@ if __name__ == "__main__":
 
     cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 12)"
     cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 12)"
+    
+    cut1 = cut12 + " && layer1HasBadPixels"
+    cut2 = cut12 + " && layer2HasBadPixels"
+    cut3 = cut34 + " && layer3HasBadPixels"
+    cut4 = cut34 + " && layer4HasBadPixels"
 
-    cut1left = cut12 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2  == 0)"
-    cut1right = cut12 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2  == 1)"
 
-    cut1even = cut12 + "&& (layer1SizeY % 2 == 0)"
+    cut1left = cut1 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2 ==0)"
+    cut2left = cut2 + "&& (layer2SizeY % 2 == 1) && (layer2ymin %2 ==0)"
+    cut3left = cut3 + "&& (layer3SizeY % 2 == 1) && (layer3ymin %2 ==0)"
+    cut4left = cut4 + "&& (layer4SizeY % 2 == 1) && (layer4ymin %2 ==0)"
 
-    cut2left = cut12 + "&& (layer2SizeY % 2 == 1) && (layer2ymin %2  == 0)"
-    cut2right = cut12 + "&& (layer2SizeY % 2 == 1) && (layer2ymin %2  == 1)"
+    cut1right = cut1 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2 ==1)"
+    cut2right = cut2 + "&& (layer2SizeY % 2 == 1) && (layer2ymin %2 ==1)"
+    cut3right = cut3 + "&& (layer3SizeY % 2 == 1) && (layer3ymin %2 ==1)"
+    cut4right = cut4 + "&& (layer4SizeY % 2 == 1) && (layer4ymin %2 ==1)"
 
-    h1_resx = getHist(pTree, "layer1dx", "layer1x", cut12)
-    h1_resz = getHist(pTree, "layer1dz", "layer1z", cut12)
+    cut1even = cut1 + "&& (layer1SizeY % 2 == 0)"
+    cut2even = cut2 + "&& (layer2SizeY % 2 == 0)"
+    cut3even = cut3 + "&& (layer3SizeY % 2 == 0)"
+    cut4even = cut4 + "&& (layer4SizeY % 2 == 0)"
 
-    h2_resx = getHist(pTree, "layer2dx", "layer2x", cut12)
-    h2_resz = getHist(pTree, "layer2dz", "layer2z", cut12)
 
-    h3_resx = getHist(pTree, "layer3dx", "layer3x", cut34)
-    h3_resz = getHist(pTree, "layer3dz", "layer3z", cut34)
+    h1_resx = getHist(pTree, "layer1dx", "layer1x", cut1)
+    h1_resz = getHist(pTree, "layer1dz", "layer1z", cut1)
 
-    h4_resx = getHist(pTree, "layer4dx", "layer4x", cut34)
-    h4_resz = getHist(pTree, "layer4dz", "layer4z", cut34)
+    h2_resx = getHist(pTree, "layer2dx", "layer2x", cut2)
+    h2_resz = getHist(pTree, "layer2dz", "layer2z", cut2)
+
+    h3_resx = getHist(pTree, "layer3dx", "layer3x", cut3)
+    h3_resz = getHist(pTree, "layer3dz", "layer3z", cut3)
+
+    h4_resx = getHist(pTree, "layer4dx", "layer4x", cut4)
+    h4_resz = getHist(pTree, "layer4dz", "layer4z", cut4)
 
     h1_resx.GetXaxis().SetTitle("#Delta X [#mum]")
     h1_resz.GetXaxis().SetTitle("#Delta Z [#mum]")
@@ -81,22 +95,29 @@ if __name__ == "__main__":
     h4_resx.GetXaxis().SetTitle("#Delta X [#mum]")
     h4_resz.GetXaxis().SetTitle("#Delta Z [#mum]")
 
+
     h1_leftz = getHist(pTree, "layer1dz", "layer1zleft", cut1left)
     h1_rightz = getHist(pTree, "layer1dz", "layer1zright", cut1right)
     h1_evenz = getHist(pTree, "layer1dz", "layer1zeven", cut1even)
 
     h2_leftz = getHist(pTree, "layer2dz", "layer2zleft", cut2left)
     h2_rightz = getHist(pTree, "layer2dz", "layer2zright", cut2right)
+    h2_evenz = getHist(pTree, "layer2dz", "layer2zeven", cut2even)
 
-    h1_leftx = getHist(pTree, "layer1dx", "layer1xleft", cut1left)
-    h1_rightx = getHist(pTree, "layer1dx", "layer1xright", cut1right)
+    h3_leftz = getHist(pTree, "layer3dz", "layer3zleft", cut3left)
+    h3_rightz = getHist(pTree, "layer3dz", "layer3zright", cut3right)
+    h3_evenz = getHist(pTree, "layer3dz", "layer3zeven", cut3even)
+
+    h4_leftz = getHist(pTree, "layer4dz", "layer4zleft", cut4left)
+    h4_rightz = getHist(pTree, "layer4dz", "layer4zright", cut4right)
+    h4_evenz = getHist(pTree, "layer4dz", "layer4zeven", cut4even)
 
 
 
     lstyle = 0
     lColor = kBlack
     lTag2 = 'Track p_{T}>12 GeV'
-    outDir = 'plots/BPix'
+    outDir = 'plots/Jan30'
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resx,label,lColor,lstyle,"Layer 1",lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resz,label,lColor,lstyle,"Layer 1",lTag2,outDir,0,100)
@@ -110,15 +131,26 @@ if __name__ == "__main__":
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_resx,label,lColor,lstyle,"Layer 4",lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_resz,label,lColor,lstyle,"Layer 4",lTag2,outDir,0,100)
 
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_leftz,label,lColor,lstyle,"Layer 1 left",lTag2,outDir,0,100)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_rightz,label,lColor,lstyle,"Layer 1 right",lTag2,outDir,0,100)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_evenz,label,lColor,lstyle,"Layer 1 even length",lTag2,outDir,0,100)
 
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_leftz,label,lColor,lstyle,"Layer 2 left",lTag2,outDir,0,100)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_rightz,label,lColor,lstyle,"Layer 2 right",lTag2,outDir,0,100)
 
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_leftx,label,lColor,lstyle,"Layer 1 left",lTag2,outDir,0,100)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_rightx,label,lColor,lstyle,"Layer 1 right",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_leftz,label,lColor,lstyle,"Layer 1 left ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_rightz,label,lColor,lstyle,"Layer 1 right ",lTag2,outDir,0,100)
 
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_leftz,label,lColor,lstyle,"Layer  2 left ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_rightz,label,lColor,lstyle,"Layer 2 right ",lTag2,outDir,0,100)
+
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h3_leftz,label,lColor,lstyle,"Layer 3 left",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h3_rightz,label,lColor,lstyle,"Layer 3 right ",lTag2,outDir,0,100)
+
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_leftz,label,lColor,lstyle,"Layer 4 left ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_rightz,label,lColor,lstyle,"Layer 4 right ",lTag2,outDir,0,100)
+
+
+
+
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_evenz,label,lColor,lstyle,"Layer 1 even ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_evenz,label,lColor,lstyle,"Layer 2 even ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h3_evenz,label,lColor,lstyle,"Layer 3 even ",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_evenz,label,lColor,lstyle,"Layer 4 even ",lTag2,outDir,0,100)
 
 
