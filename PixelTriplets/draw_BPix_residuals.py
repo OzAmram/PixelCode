@@ -12,7 +12,7 @@ def outputResid(h, outputName):
     c.Print(outputName)
     return True
 
-def getHist(tree, var, name, cut, nBins = 50, binLow = -300., binHigh = 300.):
+def getHist(tree, var, name, cut, nBins = 30, binLow = -500., binHigh = 500.):
     h = TH1F(name, name, nBins, binLow, binHigh)
     tree.Draw("%s>>%s" %(var, name),cut)
     h = gDirectory.Get(name)

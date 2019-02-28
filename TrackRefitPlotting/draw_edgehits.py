@@ -156,6 +156,19 @@ if __name__ == "__main__":
     lTag2 = 'Track p_{T}>10 GeV'
     outDir = 'plots/Dec6'
 
+    h_residy_ontrack = TH2F("residy_ontrack","", 20, 0, 500, 10000,0,2)
+    getOnTrackHist(h_residy_ontrack, pTree)
+    prof_y_trk = h_residy_ontrack.ProfileX("pfx_trk")
+    c = TCanvas("c", "", 0,0, 1200, 800)
+    c.cd()
+    prof_y_trk.Draw("")
+    prof_y_trk.GetYaxis().SetTitle("Fraction onTrack")
+    prof_y_trk.GetXaxis().SetTitle("#DeltaY (1D) (#mu m)")
+    tag = ROOT.TLatex(0.80,0.82, "Layer %i Edge" %layer)
+    tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
+    tag.Draw()
+    c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "residy_ontrack"))
+
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resx,label,lColor,lstyle,"1D: Layer %i"%layer,lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resy,label,lColor,lstyle,"1D: Layer %i"%layer,lTag2,outDir,0,100)
 
@@ -181,18 +194,6 @@ if __name__ == "__main__":
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_yrightx,label,lColor,lstyle,"CR: Layer %i EdgeY ymax=415"%layer,lTag2,outDir,0,100)
 
 
-    h_residy_ontrack = TH2F("residy_ontrack","", 20, 0, 500, 2,0,1.2)
-    getOnTrackHist(h_residy_ontrack, pTree)
-    prof_y_trk = h_residy_ontrack.ProfileX("pfx_trk")
-    c = TCanvas("c", "", 0,0, 1200, 800)
-    c.cd()
-    prof_y_trk.Draw("")
-    prof_y_trk.GetYaxis().SetTitle("Fraction onTrack")
-    prof_y_trk.GetXaxis().SetTitle("#DeltaY (1D) (#mu m)")
-    tag = ROOT.TLatex(0.80,0.82, "Layer %i Edge" %layer)
-    tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
-    tag.Draw()
-    c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "residy_ontrack"))
 
 
     output1D(h2_probQ,label,kBlue,lstyle,"CR",lTag2,outDir)
