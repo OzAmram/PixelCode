@@ -78,7 +78,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_PromptLike_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_23_14_42_31', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '105X_dataRun2_v6', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -118,6 +119,12 @@ process.trackFitter.src = 'TrackerTrackHitFilter'
 #process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
 #process.trackRefitter.src = 'TrackerTrackHitFilter'
 process.TrackRefitter_step = cms.Path( process.MeasurementTrackerEvent * process.TrackerTrackHitFilter * process.trackFitter * process.reconstruction) 
+
+#TURN ON CR FOR RECO
+
+#process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
+
+
 #------------------------------------------
 #  Define your Analyzer(s) here
 #------------------------------------------

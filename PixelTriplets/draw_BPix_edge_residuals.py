@@ -49,11 +49,8 @@ if __name__ == "__main__":
 
     cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 12)"
     cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 12)"
+    outDir = 'plots/mar14'
     
-    cut1 = cut12 + " && layer1HasBadPixels"
-    cut2 = cut12 + " && layer2HasBadPixels"
-    cut3 = cut34 + " && layer3HasBadPixels"
-    cut4 = cut34 + " && layer4HasBadPixels"
 
     cut1_edge = cut12 + " && ((layer1ymin ==0) || (layer1ymax == 415))"
     cut2_edge = cut12 + " && ((layer2ymin ==0) || (layer2ymax == 415))"
@@ -113,7 +110,6 @@ if __name__ == "__main__":
     lstyle = 0
     lColor = kBlack
     lTag2 = 'Track p_{T}>12 GeV'
-    outDir = 'plots/Jan30Edge'
 
 
 

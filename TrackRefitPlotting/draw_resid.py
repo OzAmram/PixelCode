@@ -58,7 +58,6 @@ if __name__ == "__main__":
         layer = int(sys.argv[3])
     fin = TFile.Open(inputFile)
 
-    outDir = 'plots/jan21'
 
     import tdrstyle
     tdrstyle.setTDRStyle()
@@ -76,11 +75,13 @@ if __name__ == "__main__":
 
     pTree = fin.Get("Layer1_Residuals/tree")
 
-    #cut = "1"
-    cut = "!isOnEdge2D && hasBadPixels2D && numLayers > 6"
+    do_onTrack = False
+
+    outDir = 'plots/mar13'
+    #cut = "numLayers > 6"
+    cut = "!isOnEdge1D && !hasBadPixels2D && numLayers > 6"
     #cut = "(hit_type == 1)"
     #cut = "(hasBadPixels2D)"
-    #cut = "(hit_type ==1  && !hasBadPixels2D && !isOnEdge2D)"
     #cut = "(isOnEdge2D)"
 
     cutleft = cut + "&& (clustSizeY % 2 == 1) && (clustymin %2  == 0)"
@@ -135,31 +136,6 @@ if __name__ == "__main__":
     etamin = 0.0
     etamax = 3.0
 
-    h_residy_ontrack = TH2F("residy_ontrack","", 50, 0, 500, 10000,0,2)
-    getOnTrackHist(h_residy_ontrack, pTree, etamin, etamax)
-    prof_y_trk = h_residy_ontrack.ProfileX("pfx_trk")
-    c = TCanvas("c", "", 0,0, 1200, 800)
-    c.cd()
-    prof_y_trk.Draw("PE")
-    prof_y_trk.GetYaxis().SetTitle("Fraction onTrack")
-    prof_y_trk.GetXaxis().SetTitle("#DeltaY (1D) (#mu m)")
-    tag = ROOT.TLatex(0.80,0.82, "Layer %i" %layer)
-    tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
-    tag.Draw()
-    c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "residy_ontrack"))
-
-    h_resid_ontrack = TH2F("resid_ontrack","", 50, 0, 500, 10000,0,2)
-    getOnTrackHist_v2(h_resid_ontrack, pTree, etamin, etamax)
-    prof_trk = h_resid_ontrack.ProfileX("pfx_trk")
-    c = TCanvas("c", "", 0,0, 1200, 800)
-    c.cd()
-    prof_trk.Draw("PE")
-    prof_trk.GetYaxis().SetTitle("Fraction onTrack")
-    prof_trk.GetXaxis().SetTitle("#Delta (1D) (#mu m)")
-    tag = ROOT.TLatex(0.80,0.82, "Layer %i" %layer)
-    tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
-    tag.Draw()
-    c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "resid_ontrack"))
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resx,label,lColor,lstyle,"1D: Layer %i"%layer,lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resy,label,lColor,lstyle,"1D: Layer %i"%layer,lTag2,outDir,0,100)
@@ -183,5 +159,33 @@ if __name__ == "__main__":
 
     output1D(h2_probXY,label,kBlue,lstyle,"CR",lTag2,outDir)
     output1D(h1_probXY,label,kBlue,lstyle,"1D",lTag2,outDir)
+    
+    if(do_onTrack):
+        h_residy_ontrack = TH2F("residy_ontrack","", 50, 0, 500, 10000,0,2)
+        getOnTrackHist(h_residy_ontrack, pTree, etamin, etamax)
+        prof_y_trk = h_residy_ontrack.ProfileX("pfx_trk")
+        c = TCanvas("c", "", 0,0, 1200, 800)
+        c.cd()
+        prof_y_trk.Draw("PE")
+        prof_y_trk.GetYaxis().SetTitle("Fraction onTrack")
+        prof_y_trk.GetXaxis().SetTitle("#DeltaY (1D) (#mu m)")
+        tag = ROOT.TLatex(0.80,0.82, "Layer %i" %layer)
+        tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
+        tag.Draw()
+        c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "residy_ontrack"))
+
+        h_resid_ontrack = TH2F("resid_ontrack","", 50, 0, 500, 10000,0,2)
+        getOnTrackHist_v2(h_resid_ontrack, pTree, etamin, etamax)
+        prof_trk = h_resid_ontrack.ProfileX("pfx_trk")
+        c = TCanvas("c", "", 0,0, 1200, 800)
+        c.cd()
+        prof_trk.Draw("PE")
+        prof_trk.GetYaxis().SetTitle("Fraction onTrack")
+        prof_trk.GetXaxis().SetTitle("#Delta (1D) (#mu m)")
+        tag = ROOT.TLatex(0.80,0.82, "Layer %i" %layer)
+        tag.SetNDC(); tag.SetTextFont(42); tag.SetTextSize(0.025);
+        tag.Draw()
+        c.SaveAs("%s/Residuals_%s_%s.png"%(outDir,label, "resid_ontrack"))
+
 
 

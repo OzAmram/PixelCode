@@ -140,6 +140,7 @@ process.TFileService = cms.Service('TFileService',
 )
 
 # Paths
+#process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
 process.BPixResolution_step = cms.Path(process.BPixResolution_Template)
 process.FPixResolution_step = cms.Path(process.FPixResolution_Template*process.FPixResolution_Generic)
 
