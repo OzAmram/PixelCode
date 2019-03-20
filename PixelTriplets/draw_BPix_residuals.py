@@ -50,10 +50,10 @@ if __name__ == "__main__":
     cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 12)"
     cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 12)"
     
-    cut1 = cut12 #+ " && layer1HasBadPixels"
-    cut2 = cut12 #+ " && layer2HasBadPixels"
-    cut3 = cut34 #+ " && layer3HasBadPixels"
-    cut4 = cut34 #+ " && layer4HasBadPixels"
+    cut1 = cut12 + " && layer1HasBadPixels"
+    cut2 = cut12 + " && layer2HasBadPixels"
+    cut3 = cut34 + " && layer3HasBadPixels"
+    cut4 = cut34 + " && layer4HasBadPixels"
 
 
     cut1left = cut1 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2 ==0)"
