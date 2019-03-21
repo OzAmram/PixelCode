@@ -19,31 +19,6 @@ def getHist(tree, var, name, cut, nBins = 100, binLow = -300., binHigh = 300.):
     h.SetDirectory(0)
     return h
 
-def getOnTrackHist(h, pTree, etamin = 0., etamax = 3.0):
-    max_resid = 2000.
-    for e in xrange(pTree.GetEntries()):
-        pTree.GetEntry(e)
-        #13x21 array of floats
-        resid1Dy = pTree.resid1Dy
-        resid1Dx = pTree.resid1Dx
-
-        cut = (not pTree.isOnEdge2D) and pTree.assocTrack and abs(pTree.trkEta) > etamin and abs(pTree.trkEta) < etamax
-        if((abs(resid1Dy) < max_resid) and (abs(resid1Dx) < max_resid) and cut):
-                h.Fill(abs(pTree.resid1Dy), pTree.onTrack)
-    return h
-
-def getOnTrackHist_v2(h, pTree, etamin, etamax):
-    max_resid = 500.
-    for e in xrange(pTree.GetEntries()):
-        pTree.GetEntry(e)
-        #13x21 array of floats
-        resid1Dy = pTree.resid1Dy
-        resid1Dx = pTree.resid1Dx
-
-        cut = (not pTree.isOnEdge2D) and pTree.assocTrack and abs(pTree.trkEta) > etamin and abs(pTree.trkEta) < etamax
-        if((abs(resid1Dy) < max_resid) and (abs(resid1Dx) < max_resid) and cut):
-                h.Fill(sqrt(pTree.resid1Dy**2 + pTree.resid1Dx**2), pTree.onTrack)
-    return h
 
 
 if __name__ == "__main__":
@@ -77,7 +52,7 @@ if __name__ == "__main__":
     pTree = fin.Get("Layer1_Residuals/tree")
 
     #cut = "1"
-    cut = "!isOnEdge2D && hasBadPixels2D && numLayers > 6"
+    cut = "(isOnEdge2D || hasBadPixels2D) && numLayers > 6"
     #cut = "(hit_type == 1)"
     #cut = "(hasBadPixels2D)"
     #cut = "(hit_type ==1  && !hasBadPixels2D && !isOnEdge2D)"
@@ -91,10 +66,22 @@ if __name__ == "__main__":
     nbins = 50
 
     h1_err1Dx = getHist(pTree, "err1Dx", "err1Dx", cut,40, 0., 100.);
-    h1_err2Dx = getHist(pTree, "err2Dx", "err1Dx", cut, 40, 0., 100.);
+    h1_err2Dx = getHist(pTree, "err2Dx", "err2Dx", cut, 40, 0., 100.);
 
     h1_err1Dy = getHist(pTree, "err1Dy", "err1Dy", cut,40, 0., 100.);
-    h1_err2Dy = getHist(pTree, "err2Dy", "err1Dy", cut, 40, 0., 100.);
+    h1_err2Dy = getHist(pTree, "err2Dy", "err2Dy", cut, 40, 0., 100.);
+
+    h1_pull1Dx = getHist(pTree, "resid1Dx/err1Dx", "pull1Dx", cut,100, -10., 10.);
+    h1_pull1Dy = getHist(pTree, "resid1Dy/err1Dy", "pull1Dy", cut, 100, -10., 10.);
+
+    h1_pull2Dx = getHist(pTree, "resid2Dx/err2Dx", "pull2Dx", cut,100, -10., 10.);
+    h1_pull2Dy = getHist(pTree, "resid2Dy/err2Dy", "pull2Dy", cut, 100, -10., 10.);
+
+    h1_pull1Dx.GetXaxis().SetTitle("Pull X");
+    h1_pull2Dx.GetXaxis().SetTitle("Pull X ");
+
+    h1_pull1Dy.GetXaxis().SetTitle("Pull Y");
+    h1_pull2Dy.GetXaxis().SetTitle("Pull Y ");
 
     h1_err1Dx.GetXaxis().SetTitle("Hit Error X [#mum]");
     h1_err2Dx.GetXaxis().SetTitle("Hit Error X [#mum]");
@@ -117,5 +104,10 @@ if __name__ == "__main__":
     output1D(h1_err1Dy,label,kBlue,lstyle,"1D",lTag2,outDir)
     output1D(h1_err2Dy,label,kBlue,lstyle,"CR",lTag2,outDir)
 
+    output1DGauss(h1_pull1Dx,label,kBlue,lstyle,"1D",lTag2,outDir)
+    output1DGauss(h1_pull2Dx,label,kBlue,lstyle,"CR",lTag2,outDir)
+
+    output1DGauss(h1_pull1Dy,label,kBlue,lstyle,"1D",lTag2,outDir)
+    output1DGauss(h1_pull2Dy,label,kBlue,lstyle,"CR",lTag2,outDir)
 
 
