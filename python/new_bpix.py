@@ -41,9 +41,14 @@ process.source = cms.Source("PoolSource",
 #'/store/express/Run2018D/ExpressPhysics/FEVT/Express-v1/000/324/318/00000/16238B89-A4D3-3542-A1BA-AC51A3F00DBD.root'
 #'/store/data/Run2018D/SingleMuon/RAW/v1/000/324/318/00000/35BD0831-687D-194F-A07C-3E85CF60D2B1.root'
 #'/store/data/Run2018D/JetHT/RAW/v1/000/324/318/00000/53544E6D-FD2B-F843-B87C-43998833DC43.root'
-#'/store/data/Run2018D/DoubleMuon/RAW/v1/000/321/833/00000/8644BCBB-D8A9-E811-B640-FA163EDE417A.root'
-#'/store/data/Run2018D/DoubleMuon/RAW/v1/000/321/833/00000/B62DB1BB-D9A9-E811-BC1F-FA163E7C3F50.root'
 '/store/data/Run2018D/SingleMuon/RAW/v1/000/321/833/00000/9CD43785-D4A9-E811-893C-FA163EF8F660.root'
+#'/store/data/Run2017C/SingleMuon/RAW-RECO/ZMu-17Nov2017-v1/40002/6875F8E9-AAD8-E711-9692-02163E01A6ED.root'
+#'/store/data/Run2017D/ZeroBias/RAW/v1/000/302/472/00000/14ED72FB-EA93-E711-A4D6-02163E01199A.root'
+#'/store/data/Run2017E/ZeroBias/RAW/v1/000/303/885/00000/5690C52F-93A2-E711-9EFE-02163E0145C8.root'
+#'/store/data/Run2017E/ZeroBias/RAW/v1/000/304/292/00000/DABDE1BF-FDA7-E711-A62B-02163E01298D.root'
+#'/store/data/Run2017F/ZeroBias/RAW/v1/000/305/081/00000/2CBF4EFF-8EB2-E711-9D18-02163E019B1E.root'
+#'/store/data/Run2018B/ZeroBias/RAW/v1/000/317/696/00000/66F9795E-156E-E811-934F-FA163E3509C2.root'
+
 
 ),
     secondaryFileNames = cms.untracked.vstring()
@@ -80,7 +85,9 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_PromptLike_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_23_14_42_31', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '105X_dataRun2_Candidate_2019_04_02_00_09_32', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '105X_dataRun2_Candidate_2019_04_02_18_34_04', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -140,7 +147,7 @@ process.TFileService = cms.Service('TFileService',
 )
 
 # Paths
-#process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
+process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
 process.BPixResolution_step = cms.Path(process.BPixResolution_Template)
 process.FPixResolution_step = cms.Path(process.FPixResolution_Template*process.FPixResolution_Generic)
 

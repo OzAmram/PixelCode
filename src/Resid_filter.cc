@@ -224,8 +224,8 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
             iTrackGeneral != tracksGeneral->end(); ++iTrackGeneral ) {
 
 
-        //we only use refit tracks with > 10 pt
-        if(iTrackGeneral->pt() < 8.) continue;
+        //we only use refit tracks above a minimum pt
+        if(iTrackGeneral->pt() < min_pt) continue;
         bool found_trk = true;
         //printf("lets check new track \n");
 
@@ -752,6 +752,61 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
         cout << "Unable to find TrackerDigiGeometry. Return\n";
         return;
     }
+    // primary vertices:
+    Handle<VertexCollection> vertices;
+    iEvent.getByToken( t_offlinePrimaryVertices_,vertices );
+
+    if( vertices.failedToGet() ) return;
+    if( !vertices.isValid() ) return;
+
+
+    // need vertex global point for tracks
+    // from #include "DataFormats/GeometryVector/interface/GlobalPoint.h"
+    // Global points are three-dimensional by default
+    // typedef Global3DPoint  GlobalPoint;
+    // typedef Point3DBase< float, GlobalTag> Global3DPoint;
+
+    XYZPoint vtxN = XYZPoint(0,0,0);
+    XYZPoint vtxP = XYZPoint(0,0,0);
+
+    double bestNdof = 0;
+    double maxSumPt = 0;
+    Vertex bestPvx;
+
+    for( VertexCollection::const_iterator iVertex = vertices->begin();
+            iVertex != vertices->end(); ++iVertex ) {
+
+        if( ! iVertex->isValid() )
+            continue;
+
+        else {
+
+            if( iVertex->isFake() )
+                continue;
+
+            else{
+
+
+                if( iVertex->ndof() > bestNdof ) {
+                    bestNdof = iVertex->ndof();
+                    vtxN = XYZPoint( iVertex->x(), iVertex->y(), iVertex->z() );
+                }
+
+
+                if( iVertex->p4().pt() > maxSumPt ) {
+                    maxSumPt = iVertex->p4().pt();
+                    vtxP = XYZPoint( iVertex->x(), iVertex->y(), iVertex->z() );
+                    bestPvx = *iVertex;
+                }
+            }// non-fake
+        }//valid
+    } // loop over vertices
+
+
+        if(maxSumPt < 1 ) return;
+
+        if( maxSumPt < 1 ) vtxP = vtxN;
+
 
     //----------------------------------------------------------------------------
     // Tracks:
@@ -767,8 +822,8 @@ void Resid_filter::analyze(const edm::Event& iEvent, const edm::EventSetup& iSet
 
         trkPt = pt;
         trkEta = iTrack->eta();
-        if(pt < 10.) continue;
-
+        if(pt < min_pt) continue;
+        if( (abs( iTrack->dxy(vtxP) ) > 5*iTrack->dxyError()) ) continue; // not prompt
 
 
         //--------------------------------------------------------------------------

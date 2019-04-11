@@ -12,6 +12,11 @@ def outputResid(h, outputName):
     c.Print(outputName)
     return True
 
+def get_frac(tree, var, cut):
+    h = TH1F("h"+var, "", 10000, 0.,2.)
+    tree.Draw("%s>>%s" %(var, "h"+var),cut)
+    return h.GetMean()
+
 def getHist(tree, var, name, cut, nBins = 100, binLow = -300., binHigh = 300.):
     h = TH1F(name, name, nBins, binLow, binHigh)
     tree.Draw("%s>>%s" %(var, name),cut)
@@ -77,12 +82,13 @@ if __name__ == "__main__":
 
     do_onTrack = False
 
-    outDir = 'plots/mar13'
-    #cut = "numLayers > 6"
-    cut = "!isOnEdge1D && !hasBadPixels2D && numLayers > 6"
+    outDir = 'plots/mar14'
+    cut = "numLayers > 6"
+    #cut = "!isOnEdge1D && hasBadPixels2D && numLayers > 6"
     #cut = "(hit_type == 1)"
     #cut = "(hasBadPixels2D)"
     #cut = "(isOnEdge2D)"
+    lTag2 = 'Track p_{T}>0.75 GeV'
 
     cutleft = cut + "&& (clustSizeY % 2 == 1) && (clustymin %2  == 0)"
     cutright = cut + "&& (clustSizeY % 2 == 1) && (clustymin %2  == 1)"
@@ -132,7 +138,6 @@ if __name__ == "__main__":
 
     lstyle = 0
     lColor = kBlack
-    lTag2 = 'Track p_{T}>10 GeV'
     etamin = 0.0
     etamax = 3.0
 
@@ -159,6 +164,9 @@ if __name__ == "__main__":
 
     output1D(h2_probXY,label,kBlue,lstyle,"CR",lTag2,outDir)
     output1D(h1_probXY,label,kBlue,lstyle,"1D",lTag2,outDir)
+
+    fBadPix = get_frac(pTree, "hasBadPixels2D", "")
+    print("Fraction badPix is %.3f \n" % fBadPix)
     
     if(do_onTrack):
         h_residy_ontrack = TH2F("residy_ontrack","", 50, 0, 500, 10000,0,2)

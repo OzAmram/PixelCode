@@ -70,10 +70,11 @@ if __name__ == "__main__":
         exit(1)
 
     pTree = fin.Get("Layer1_Residuals/tree")
+    outDir = 'plots/mar20'
     #print_edges(pTree)
     #exit(1)
 
-    cut = "(clustxmin == 0 || clustxmax == 159 || clustymin==0 || clustymax==415) && assocTrack "
+    cut = "(clustxmin == 0 || clustxmax == 159 || clustymin==0 || clustymax==415) && assocTrack"
     cutx = cut + "&& (clustxmin ==0 || clustxmax ==159)"
     cuty = cut + "&& (clustymin ==0 || clustymax ==415)"
 
@@ -154,7 +155,6 @@ if __name__ == "__main__":
     lstyle = 0
     lColor = kBlack
     lTag2 = 'Track p_{T}>10 GeV'
-    outDir = 'plots/Dec6'
 
     h_residy_ontrack = TH2F("residy_ontrack","", 20, 0, 500, 10000,0,2)
     getOnTrackHist(h_residy_ontrack, pTree)

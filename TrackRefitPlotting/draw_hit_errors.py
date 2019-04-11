@@ -51,8 +51,11 @@ if __name__ == "__main__":
 
     pTree = fin.Get("Layer1_Residuals/tree")
 
+    outDir = 'plots/mar13'
+    lTag2 = 'Track p_{T}>10 GeV'
     #cut = "1"
-    cut = "(isOnEdge2D || hasBadPixels2D) && numLayers > 6"
+    #cut = "(isOnEdge2D || hasBadPixels2D) && numLayers > 6"
+    cut = "(isOnEdge2D) && numLayers > 6"
     #cut = "(hit_type == 1)"
     #cut = "(hasBadPixels2D)"
     #cut = "(hit_type ==1  && !hasBadPixels2D && !isOnEdge2D)"
@@ -90,11 +93,9 @@ if __name__ == "__main__":
     h1_err2Dy.GetXaxis().SetTitle("Hit Error Y [#mum]");
 
 
-    outDir = 'plots/feb28'
 
     lstyle = 0
     lColor = kBlack
-    lTag2 = 'Track p_{T}>10 GeV'
     etamin = 0.0
     etamax = 3.0
 

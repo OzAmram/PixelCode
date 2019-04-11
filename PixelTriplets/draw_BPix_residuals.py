@@ -45,15 +45,16 @@ if __name__ == "__main__":
         exit(1)
 
     pTree = fin.Get("BPixResolution_Template/tree")
-    outDir = 'plots/mar14'
+    outDir = 'plots/mar20_lowpt'
 
-    cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 12)"
-    cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 12)"
+    lTag2 = 'Track p_{T}>0.75 GeV'
+    cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 0.75)"
+    cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 0.75)"
     
-    cut1 = cut12 + " && layer1HasBadPixels"
-    cut2 = cut12 + " && layer2HasBadPixels"
-    cut3 = cut34 + " && layer3HasBadPixels"
-    cut4 = cut34 + " && layer4HasBadPixels"
+    cut1 = cut12 #+ " && layer1HasBadPixels"
+    cut2 = cut12 #+ " && layer2HasBadPixels"
+    cut3 = cut34 #+ " && layer3HasBadPixels"
+    cut4 = cut34 #+ " && layer4HasBadPixels"
 
 
     cut1left = cut1 + "&& (layer1SizeY % 2 == 1) && (layer1ymin %2 ==0)"
@@ -117,7 +118,6 @@ if __name__ == "__main__":
 
     lstyle = 0
     lColor = kBlack
-    lTag2 = 'Track p_{T}>12 GeV'
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resx,label,lColor,lstyle,"Layer 1",lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resz,label,lColor,lstyle,"Layer 1",lTag2,outDir,0,100)

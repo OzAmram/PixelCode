@@ -80,7 +80,8 @@ def output1DGauss(h,iLegend,iColor,iStyle,iName,iName2,iOdir):
     tag9 = ROOT.TLatex(0.70,0.71,"#sigma: %.2f +/- %.2f "%(fitRes.GetParameter(2), fitRes.GetParError(2)))
     tag9.SetNDC(); tag9.SetTextFont(42); tag9.SetTextSize(0.02); tag9.SetTextColor(1);
     h.SetFillColor(iColor)
-    h.Draw("hist same")
+    h.Draw("ep same")
+    fitRes.SetLineColor(ROOT.kGreen);
     fitRes.SetLineWidth(2)
     fitRes.Draw("same")
     tag3.Draw()

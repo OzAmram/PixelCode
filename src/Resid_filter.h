@@ -248,6 +248,7 @@ private:
   edm::EDGetTokenT<edm::ConditionsInRunBlock>              conditionsInRunBlockToken_;
 
   int dropLayer = 1;
+  float min_pt = 0.75;
 
   // Tools
   SiPixelCoordinates coord_;
