@@ -5,13 +5,13 @@ from optparse import OptionParser
 import sys
 
 def make_ratio_plot(h1, h2, label1, label2, outfile, rebin=0):
-    c1 = TCanvas("c1", "")
+    c1 = TCanvas("c1", "", 1000, 1000)
     p1 = TPad("pad1", "", 0., 0.3, 0.98,1.)
     p1.SetBottomMargin(0)
     p1.Draw()
     p1.cd()
 
-    x_start = 0.3
+    x_start = 0.7
     y_start = 0.77
     tag5 = ROOT.TLatex(x_start,y_start + 0.09,"Default Mean: %.3e +/- %.3e "%(h1.GetMean(),h1.GetMeanError()))
     tag5.SetNDC(); tag5.SetTextFont(42); tag5.SetTextSize(0.02); tag5.SetTextColor(1);
@@ -46,14 +46,14 @@ def make_ratio_plot(h1, h2, label1, label2, outfile, rebin=0):
     leg_size = 0.2
     leg_x = 0.53
     leg_y = 0.7
-    leg = TLegend(leg_x, leg_y, leg_x + leg_size, leg_y + leg_size)
+    leg = TLegend(leg_size, leg_size)
     leg.AddEntry(h1, label1)
     leg.AddEntry(h2, label2)
     leg.Draw()
 
     c1.cd()
     p2 = TPad("pad2", "", 0., 0., 0.98, 0.3)
-    p2.SetTopMargin(0.2)
+    p2.SetTopMargin(0.)
     p2.SetGridy()
     p2.Draw()
     p2.cd()
@@ -100,11 +100,12 @@ if __name__ == "__main__":
     ROOT.gROOT.SetBatch()
 
     base_dir = "DQMData/Run 321833/"
-    #my_hist = "Tracking/Run summary/TrackParameters/highPurityTracks/dzPV0p1/GeneralProperties/"
-    my_hist = "PixelPhase1/Run summary/Tracks/PXBarrel/"
+    #my_hist = "Tracking/Run summary/TrackParameters/highPurityTracks/pt_1/GeneralProperties/"
+    #my_hist = "PixelPhase1/Run summary/Tracks/PXBarrel/"
+    my_hist = "Btag/Run summary/IPTag_GLOBAL/"
     my_dir = base_dir + my_hist
-    name = "residual_y_PXLayer_4"
-    rebin = 5
+    name = "ipe4_3D_IPTag_GLOBALALL"
+    rebin = 0
     
     f_def.cd()
     gDirectory.cd(my_dir)

@@ -46,9 +46,10 @@ if __name__ == "__main__":
         exit(1)
 
     pTree = fin.Get("BPixResolution_Template/tree")
+    lTag2 = 'Track p_{T}>0.75 GeV'
 
-    cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 12)"
-    cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 12)"
+    cut12 = "((pxn1*pxn2*pxn3) > 0 ) && (trkPt > 0.75)"
+    cut34 = "((pxn2*pxn3*pxn4) > 0 ) && (trkPt > 0.75)"
     outDir = 'plots/mar14'
     
 
@@ -71,17 +72,24 @@ if __name__ == "__main__":
 
 
     h1_resz_edge = getHist(pTree, "layer1dz", "layer1z_edge", cut1_edge)
-
     h2_resz_edge = getHist(pTree, "layer2dz", "layer2z_edge", cut2_edge)
-
     h3_resz_edge = getHist(pTree, "layer3dz", "layer3z_edge", cut3_edge)
-
     h4_resz_edge = getHist(pTree, "layer4dz", "layer4z_edge", cut4_edge)
+
+    h1_resx_edge = getHist(pTree, "layer1dx", "layer1x_edge", cut1_edge)
+    h2_resx_edge = getHist(pTree, "layer2dx", "layer2x_edge", cut2_edge)
+    h3_resx_edge = getHist(pTree, "layer3dx", "layer3x_edge", cut3_edge)
+    h4_resx_edge = getHist(pTree, "layer4dx", "layer4x_edge", cut4_edge)
 
     h1_resz_edge.GetXaxis().SetTitle("#Delta Z [#mum]")
     h2_resz_edge.GetXaxis().SetTitle("#Delta Z [#mum]")
     h3_resz_edge.GetXaxis().SetTitle("#Delta Z [#mum]")
     h4_resz_edge.GetXaxis().SetTitle("#Delta Z [#mum]")
+
+    h1_resx_edge.GetXaxis().SetTitle("#Delta X [#mum]")
+    h2_resx_edge.GetXaxis().SetTitle("#Delta X [#mum]")
+    h3_resx_edge.GetXaxis().SetTitle("#Delta X [#mum]")
+    h4_resx_edge.GetXaxis().SetTitle("#Delta X [#mum]")
 
     h1_leftz_edge = getHist(pTree, "layer1dz", "layer1zleftedge", cut1leftedge)
     h1_rightz_edge = getHist(pTree, "layer1dz", "layer1zrightedge", cut1rightedge)
@@ -109,17 +117,18 @@ if __name__ == "__main__":
 
     lstyle = 0
     lColor = kBlack
-    lTag2 = 'Track p_{T}>12 GeV'
 
 
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resz_edge,label,lColor,lstyle,"Layer 1 EdgeY",lTag2,outDir,0,100)
-
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_resz_edge,label,lColor,lstyle,"Layer 2 EdgeY",lTag2,outDir,0,100)
-
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h3_resz_edge,label,lColor,lstyle,"Layer 3 EdgeY",lTag2,outDir,0,100)
-
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_resz_edge,label,lColor,lstyle,"Layer 4 EdgeY",lTag2,outDir,0,100)
+
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_resx_edge,label,lColor,lstyle,"Layer 1 EdgeX",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h2_resx_edge,label,lColor,lstyle,"Layer 2 EdgeX",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h3_resx_edge,label,lColor,lstyle,"Layer 3 EdgeX",lTag2,outDir,0,100)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(h4_resx_edge,label,lColor,lstyle,"Layer 4 EdgeX",lTag2,outDir,0,100)
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_leftz_edge,label,lColor,lstyle,"Layer 1 left EdgeY",lTag2,outDir,0,100)
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(h1_rightz_edge,label,lColor,lstyle,"Layer 1 right EdgeY",lTag2,outDir,0,100)

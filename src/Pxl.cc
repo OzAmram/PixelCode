@@ -530,14 +530,13 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
             trkPt = pt;
             trkEta = iTrack->eta();
 
-            if( pt < 8 ) continue;// curls up
+            if( pt < 0.75 ) continue;// curls up
 
             //float tmp = abs(iTrack->dxy(vtxP))/iTrack->dxyError();
             //cout<<pt<<" "<<abs(iTrack->dxy(vtxP))<<" "<<iTrack->dxyError()<<" "<<tmp<<endl;
 
 
-            if(!singleParticleMC &&
-                    (abs( iTrack->dxy(vtxP) ) > 5*iTrack->dxyError()) ) continue; // not prompt
+            if( (abs( iTrack->dxy(vtxP) ) > 5*iTrack->dxyError()) ) continue; // not prompt
 
 
 

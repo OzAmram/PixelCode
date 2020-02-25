@@ -42,9 +42,9 @@ def output1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir):
     tag3.SetNDC(); tag3.SetTextFont(42)
     tag4 = ROOT.TLatex(0.20,0.82,iName2)
     tag4.SetNDC(); tag4.SetTextFont(42); tag4.SetTextSize(0.025);
-    tag5 = ROOT.TLatex(0.50,0.83,"Mean: %.2f +/- %.2f "%(iTmp.GetMean(),iTmp.GetMeanError()))
+    tag5 = ROOT.TLatex(0.70,0.83,"Mean: %.2f +/- %.2f "%(iTmp.GetMean(),iTmp.GetMeanError()))
     tag5.SetNDC(); tag5.SetTextFont(42); tag5.SetTextSize(0.02); tag5.SetTextColor(1);
-    tag6 = ROOT.TLatex(0.50,0.80,"RMS: %.2f +/- %.2f "%(iTmp.GetRMS(),iTmp.GetRMSError()))
+    tag6 = ROOT.TLatex(0.70,0.80,"RMS: %.2f +/- %.2f "%(iTmp.GetRMS(),iTmp.GetRMSError()))
     tag6.SetNDC(); tag6.SetTextFont(42); tag6.SetTextSize(0.02); tag6.SetTextColor(1);
     iTmp.SetFillColor(iColor)
     iTmp.Draw("hist same");
@@ -53,6 +53,45 @@ def output1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir):
     tag5.Draw()
     tag6.Draw()
     c.SaveAs("%s/Residuals_%s_%s.png"%(iOdir,iLegend, iTmp.GetName()))
+    return None
+
+def output1DGauss(h,iLegend,iColor,iStyle,iName,iName2,iOdir):
+    #just output 1D hist
+    print "Integral of tree %s is %.0f " % (h.GetName(), h.Integral())
+
+    c =ROOT.TCanvas("cfit1d%s"%(h.GetName()),"",800,800)
+    h.Fit("gaus")
+    fitRes = h.GetFunction("gaus")
+    print("pars are %.2f %.2f %.2f"%( fitRes.GetParameter(0), fitRes.GetParameter(1), fitRes.GetParameter(2)));
+    ROOT.TGaxis.SetMaxDigits(3);
+    tag3 = ROOT.TLatex(0.4,0.92,iName)
+    tag3.SetNDC(); tag3.SetTextFont(42)
+    tag4 = ROOT.TLatex(0.20,0.82,iName2)
+    tag4.SetNDC(); tag4.SetTextFont(42); tag4.SetTextSize(0.025);
+    tag5 = ROOT.TLatex(0.70,0.83,"Mean: %.2f +/- %.2f "%(h.GetMean(),h.GetMeanError()))
+    tag5.SetNDC(); tag5.SetTextFont(42); tag5.SetTextSize(0.02); tag5.SetTextColor(1);
+    tag6 = ROOT.TLatex(0.70,0.80,"RMS: %.2f +/- %.2f "%(h.GetRMS(),h.GetRMSError()))
+    tag6.SetNDC(); tag6.SetTextFont(42); tag6.SetTextSize(0.02); tag6.SetTextColor(1);
+    tag7 = ROOT.TLatex(0.70,0.77,"kurtosis: %.2f +/- %.2f "%(h.GetKurtosis(),h.GetKurtosis(11)))
+    tag7.SetNDC(); tag7.SetTextFont(42); tag7.SetTextSize(0.02); tag7.SetTextColor(1);
+
+    tag8 = ROOT.TLatex(0.70,0.74,"#mu: %.2f +/- %.2f "%(fitRes.GetParameter(1), fitRes.GetParError(1)))
+    tag8.SetNDC(); tag8.SetTextFont(42); tag8.SetTextSize(0.02); tag8.SetTextColor(1);
+    tag9 = ROOT.TLatex(0.70,0.71,"#sigma: %.2f +/- %.2f "%(fitRes.GetParameter(2), fitRes.GetParError(2)))
+    tag9.SetNDC(); tag9.SetTextFont(42); tag9.SetTextSize(0.02); tag9.SetTextColor(1);
+    h.SetFillColor(iColor)
+    h.Draw("ep same")
+    fitRes.SetLineColor(ROOT.kGreen);
+    fitRes.SetLineWidth(2)
+    fitRes.Draw("same")
+    tag3.Draw()
+    tag4.Draw()
+    tag5.Draw()
+    tag6.Draw()
+    tag7.Draw()
+    tag8.Draw()
+    tag9.Draw()
+    c.SaveAs("%s/Residuals_%s_%s.png"%(iOdir,iLegend, h.GetName()))
     return None
 
 def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir,iMean,iWidth):
