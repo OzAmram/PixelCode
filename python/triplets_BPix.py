@@ -58,26 +58,6 @@ process.options = cms.untracked.PSet(
 
 )
 
-# Production Info
-process.configurationMetadata = cms.untracked.PSet(
-    annotation = cms.untracked.string('RECO nevts:10'),
-    name = cms.untracked.string('Applications'),
-    version = cms.untracked.string('$Revision: 1.19 $')
-)
-
-# Output definition
-
-process.RECOoutput = cms.OutputModule("PoolOutputModule",
-    dataset = cms.untracked.PSet(
-        dataTier = cms.untracked.string('RECO'),
-        filterName = cms.untracked.string('')
-    ),
-    eventAutoFlushCompressedSize = cms.untracked.int32(5242880),
-    fileName = cms.untracked.string('RECO_RAW2DIGI_L1Reco_RECO.root'),
-    outputCommands = process.RECOEventContent.outputCommands,
-    splotLevel = cms.untracked.int32(0)
-)
-
 # Additional output definition
 
 # Other statements
@@ -119,8 +99,9 @@ process.TrackRefitter_step = cms.Path(process.MeasurementTrackerEvent*process.Tr
 #  Define your Analyzer(s) here
 #------------------------------------------
 
+process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
 # BPix Resolution
-process.BPixResolution_Template = cms.EDAnalyzer('Pixel',
+process.BPixResolution_Template = cms.EDAnalyzer('Triplets_BPix',
     triggerSource = cms.InputTag('TriggerResults::HLT'),
     ttrhBuilder = cms.string('WithAngleAndTemplate'),
     orbit_beginning = cms.int32(orbit_begin_array[index]),
@@ -130,26 +111,13 @@ process.BPixResolution_Generic = process.BPixResolution_Template.clone(
     ttrhBuilder = cms.string('WithTrackAngle'),
 )
 
-# FPix Resolution
-process.FPixResolution_Template = cms.EDAnalyzer('Pixel_phase1',
-    triggerSource = cms.InputTag('TriggerResults::HLT'),
-    ttrhBuilder = cms.string('WithAngleAndTemplate'),
-    doBPix = cms.bool(False),
-    doFPix = cms.bool(True)
-)
-process.FPixResolution_Generic = process.FPixResolution_Template.clone(
-    ttrhBuilder = cms.string('WithTrackAngle')
-)
-
 # TFileService used for both BPix/FPix resolution
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string("BPix_resid_2D_var.root"),
+    fileName = cms.string("BPix_resolution.root"),
 )
 
 # Paths
-process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
 process.BPixResolution_step = cms.Path(process.BPixResolution_Template)
-process.FPixResolution_step = cms.Path(process.FPixResolution_Template*process.FPixResolution_Generic)
 
 # Schedule definition
 process.schedule = cms.Schedule(
@@ -157,7 +125,6 @@ process.schedule = cms.Schedule(
     process.L1Reco_step,
     process.reconstruction_step,
     process.TrackRefitter_step,
-#    process.FPixResolution_step,
     process.BPixResolution_step
     )
 

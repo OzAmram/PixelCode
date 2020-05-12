@@ -13,35 +13,6 @@ from Configuration.StandardSequences.Eras import eras
 process = cms.Process('NTUPLE',eras.Run2_2018)
 
 #--------------------------------------------------------------------------------------------------
-import FWCore.ParameterSet.VarParsing as opts
-opt = opts.VarParsing ('analysis')
-opt.register('dataTier',           'RAW',
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.string,
-	     'Input data tier: RAW, RECO, FEVT or AOD')
-
-opt.register('inputFile',          '',
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.string,
-	     'input file name')
-
-opt.register('secondaryInputFile', '',
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.string,
-	     'input file name')
-
-opt.register('Efficiency',         False,
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.bool,
-	     'Specify if you want to create Efficiency (TimingStudy) ntuples')
-
-opt.register('LATrees',            False,
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.bool,
-	     'Specify if you want to create Lorentz Angle (SiPixelLorentzAngle) ntuples')
-
-opt.register('BPixResolution',     False,
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.bool,
-	     'Specify if you want to create BPix Resolution (Pxl) ntuples')
-
-opt.register('FPixResolution',     True,
-	     opts.VarParsing.multiplicity.singleton, opts.VarParsing.varType.bool,
-	     'Specify if you want to create FPix Resolution (Pixel) ntuples')
 
 
 ### Events to process: 'maxEvents' is already registered by the framework
@@ -62,52 +33,10 @@ if opt.dataTier == 'RECO' or opt.dataTier == 'FEVT' or opt.dataTier == 'RAW':
 #------------------------------------------
 
 # Efficiency
-
-process.PhaseINtuplizerPlugin = cms.EDAnalyzer("PhaseIPixelNtuplizer",
-     trajectoryInput = cms.InputTag('TrackRefitter'),
-      outputFileName = cms.untracked.string('/eos/cms/store/group/dpg_tracker_pixel/comm_pixel/Monitoring/2018/Efficiency/321149_Tv6Gv3/Efficiency_321149_277.root'),
-      # Do not save everything and downscale clusters
-      clusterSaveDownscaleFactor     = cms.untracked.int32(10000),
-      #eventSaveDownscaleFactor       = cms.untracked.int32(opt.prescale),
-      eventSaveDownscaleFactor       = cms.untracked.int32(50),
-      saveDigiTree                   = cms.untracked.bool(False),
-      aveTrackTree                  = cms.untracked.bool(False),
-      saveNonPropagatedExtraTrajTree = cms.untracked.bool(False),  
-)
-
-# Lorentz Angle
-process.SiPixelLorentzAngle = cms.EDAnalyzer("SiPixelLorentzAngle",
-        src = cms.InputTag(trackInput),
-        fileName = cms.string('/eos/cms/store/group/dpg_tracker_pixel/comm_pixel/Monitoring/2018/LA/321149_Tv6Gv3/LA_321149_277.root'),
-        fileNameFit     = cms.string(""),
-        binsDepth       = cms.int32(50),
-        binsDrift =     cms.int32(200),
-        ptMin = cms.double(3),
-        ptMinFPix = cms.double(0.1),
-        #in case of MC set this to true to save the simhits (does not work currently, Mixing Module needs to be included correctly)
-        simData = cms.bool(False),
-        normChi2Max = cms.double(2),
-        clustSizeYMin = cms.int32(2),
-        residualMax = cms.double(0.01),
-        clustChargeMax = cms.double(120000)
-)
-
-# BPix Resolution
-process.BPixResolution_Template = cms.EDAnalyzer('Pxl',
-        triggerSource = cms.InputTag('TriggerResults::HLT'),
-        ttrhBuilder = cms.string('WithAngleAndTemplate'),
-        orbit_beginning = cms.int32(orbit_begin_array[index]),
-        orbit_end = cms.int32(orbit_end_array[index]),
-        )
-
-process.BPixResolution_Generic = process.BPixResolution_Template.clone(
-    ttrhBuilder = cms.string('WithTrackAngle'),
-    orbit_beginning = cms.int32(orbit_begin_array[index]),
-    orbit_end = cms.int32(orbit_end_array[index]),
-)
+process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
 
 # FPix Resolution
-process.FPixResolution_Template = cms.EDAnalyzer('Pixel_phase1',
+process.FPixResolution_Template = cms.EDAnalyzer('Triplets_FPix',
     triggerSource = cms.InputTag('TriggerResults::HLT'),
     ttrhBuilder = cms.string('WithAngleAndTemplate'),
     doBPix = cms.bool(False),
@@ -132,9 +61,7 @@ process.PhaseIPixelNtuplizer_step = cms.Path(process.PhaseINtuplizerPlugin)
 process.Efficiency_step = cms.Path(process.PhaseINtuplizerPlugin)
 
 #process.Efficiency_step     = cms.Path(process.TimingStudy)
-process.LATrees_step        = cms.Path(process.SiPixelLorentzAngle)
-process.BPixResolution_step = cms.Path(process.BPixResolution_Template*process.BPixResolution_Generic)
-process.FPixResolution_step = cms.Path(process.FPixResolution_Template*process.FPixResolution_Generic)
+process.FPixResolution_step = cms.Path(process.FPixResolution_Template)
 
 #------------------------------------------
 #  Configurations from cmsDriver.py
@@ -235,10 +162,7 @@ else:
 trackInput == 'TrackRefitter'
 if trackInput == 'TrackRefitter': process.schedule.append(process.TrackRefitter_step)
 # Add ntuplizers
-if opt.Efficiency:     process.schedule.append(process.Efficiency_step)
-if opt.LATrees:        process.schedule.append(process.LATrees_step)
-if opt.BPixResolution: process.schedule.append(process.BPixResolution_step)
-if opt.FPixResolution: process.schedule.append(process.FPixResolution_step)
+process.schedule.append(process.FPixResolution_step)
 
 
 # Production Info
@@ -250,31 +174,9 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Output definition
 
-#process.RECOoutput = cms.OutputModule("PoolOutputModule",
-#    dataset = cms.untracked.PSet(
-#        dataTier = cms.untracked.string('RECO'),
-#        filterName = cms.untracked.string('')
-#    ),
-#    fileName = cms.untracked.string('-s_RAW2DIGI_L1Reco_RECO.root'),
-#    outputCommands = process.RECOEventContent.outputCommands,
-#    splitLevel = cms.untracked.int32(0)
-#)
 
 # Additional output definition
-
-# Other statements
-#from Configuration.AlCa.GlobalTag import GlobalTag
-#process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Express_v7', '')
-
-# Path and EndPath definitions
-#process.raw2digi_step = cms.Path(process.RawToDigi)
-##process.L1Reco_step = cms.Path(process.L1Reco)
-#process.reconstruction_step = cms.Path(process.reconstruction)
-##process.endjob_step = cms.EndPath(process.endOfProcess)
-#process.RECOoutput_step = cms.EndPath(process.RECOoutput)
-
 # Schedule definition
-#process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,p#rocess.endjob_step,process.RECOoutput_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 

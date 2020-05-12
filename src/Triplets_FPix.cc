@@ -106,10 +106,10 @@
 // Flag for new tracking rechis, has to be ON for pre7 and later   
 #define NEW_TRACKINGRECHITS  // For V71X_pre7 and later 
 
-class Pixel_phase1 : public edm::EDAnalyzer{
+class Triplets_Fpix : public edm::EDAnalyzer{
 public:
-  explicit Pixel_phase1(const edm::ParameterSet&);
-  ~Pixel_phase1();
+  explicit Triplets_Fpix(const edm::ParameterSet&);
+  ~Triplets_Fpix();
 
 private:
   virtual void beginJob() ;
@@ -299,17 +299,17 @@ private:
 
 };
 
-class myCountersPixel_phase1{
+class myCountersTriplets_Fpix{
    public:
       static int neve;
       static unsigned int prevrun;
 };
 
-int myCountersPixel_phase1::neve = 0;
-unsigned int myCountersPixel_phase1::prevrun = 0;
+int myCountersTriplets_Fpix::neve = 0;
+unsigned int myCountersTriplets_Fpix::prevrun = 0;
 
 
-Pixel_phase1::Pixel_phase1(const edm::ParameterSet& iConfig)
+Triplets_Fpix::Triplets_Fpix(const edm::ParameterSet& iConfig)
 {
   std::cout << "PxlFPix constructed\n";
   _triggerSrc = iConfig.getParameter<edm::InputTag>("triggerSource");
@@ -373,7 +373,7 @@ Pixel_phase1::Pixel_phase1(const edm::ParameterSet& iConfig)
   tree->Branch("layer3Charge", &layer3Charge);
 
 }
-Pixel_phase1::~Pixel_phase1()
+Triplets_Fpix::~Triplets_Fpix()
 {
    // do anything here that needs to be done at desctruction time
    // (e.g. close files, deallocate resources etc.)
@@ -383,7 +383,7 @@ Pixel_phase1::~Pixel_phase1()
 // member functions:
 // method called once each job just before starting event loop
 
-void Pixel_phase1::beginJob()
+void Triplets_Fpix::beginJob()
 {
 
 }
@@ -391,11 +391,11 @@ void Pixel_phase1::beginJob()
 //----------------------------------------------------------------------
 // method called for each event:
 
-void Pixel_phase1::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
+void Triplets_Fpix::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 {
 }
 
-std::vector<double> Pixel_phase1::getIntersection(std::vector<double> point1, std::vector<double> point2, double rho,  const GeomDet *detHit, std::vector<double> intersection){
+std::vector<double> Triplets_Fpix::getIntersection(std::vector<double> point1, std::vector<double> point2, double rho,  const GeomDet *detHit, std::vector<double> intersection){
   /* 
          Takes two points and the curvature to create a helix, then finds the intersection with a detector plane
 	 returns the (x,y,z) local coordinates for the intersection point
@@ -436,40 +436,40 @@ std::vector<double> Pixel_phase1::getIntersection(std::vector<double> point1, st
 
 
 
-void Pixel_phase1::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
+void Triplets_Fpix::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup){
 
   bool isTriplet;
 
   if(doFPix && (int)iEvent.orbitNumber() >= (int)_orbit_beginning && (int)iEvent.orbitNumber()<= (int)_orbit_end ){
     std::string detTag = "fpix";
-    Pixel_phase1::getResiduals(iEvent, iSetup, detTag);
+    Triplets_Fpix::getResiduals(iEvent, iSetup, detTag);
   }
   if(doBPix && (int)iEvent.orbitNumber() >= (int)_orbit_beginning && (int)iEvent.orbitNumber()<= (int)_orbit_end ){
     std::string detTag = "bpix";
-    Pixel_phase1::getResiduals(iEvent, iSetup, detTag);
+    Triplets_Fpix::getResiduals(iEvent, iSetup, detTag);
   }
 
 }
 
-void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup& iSetup, std::string detTag){
+void Triplets_Fpix::getResiduals(const edm::Event & iEvent, const edm::EventSetup& iSetup, std::string detTag){
   
   using namespace std;
   using namespace edm;
   using namespace reco;
   using namespace math;
   
-  myCountersPixel_phase1::neve++;
+  myCountersTriplets_Fpix::neve++;
   
-  if( myCountersPixel_phase1::prevrun != iEvent.run() ){
+  if( myCountersTriplets_Fpix::prevrun != iEvent.run() ){
     time_t unixZeit = iEvent.time().unixTime();
     cout << "new run " << iEvent.run();
     cout << ", LumiBlock " << iEvent.luminosityBlock();
     cout << " taken " << ctime(&unixZeit); // ctime has endline
-    myCountersPixel_phase1::prevrun = iEvent.run();
+    myCountersTriplets_Fpix::prevrun = iEvent.run();
   }// new run
   
   int idbg = 0;
-  if( myCountersPixel_phase1::neve < 2 ) idbg = 1;
+  if( myCountersTriplets_Fpix::neve < 2 ) idbg = 1;
   
   int jdbg = 0;
   if( idbg ) {
@@ -1294,9 +1294,9 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	std::vector<double> intersection3 = {};
 	
 	// Create helix from two points and curvature, return the intersection point in local coordinates
-	std::vector<double> IntersectionPointLocal_1 = Pixel_phase1::getIntersection(p2, p3, rho, det1, intersection1); 
-	std::vector<double> IntersectionPointLocal_2 = Pixel_phase1::getIntersection(p1, p3, rho, det2, intersection2);
-	std::vector<double> IntersectionPointLocal_3 = Pixel_phase1::getIntersection(p1, p2, rho, det3, intersection3);
+	std::vector<double> IntersectionPointLocal_1 = Triplets_Fpix::getIntersection(p2, p3, rho, det1, intersection1); 
+	std::vector<double> IntersectionPointLocal_2 = Triplets_Fpix::getIntersection(p1, p3, rho, det2, intersection2);
+	std::vector<double> IntersectionPointLocal_3 = Triplets_Fpix::getIntersection(p1, p2, rho, det3, intersection3);
 	
 	// Intersection point in local coordinates
 	xl_ideal_1 = IntersectionPointLocal_1[0];
@@ -1321,7 +1321,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	if(n2_r1>0){
 	  std::vector<double> p2_r1 = {xPX2_r1, yPX2_r1, zPX2_r1};
 	  std::vector<double> intersection2_r1 = {};
-	  std::vector<double> IntersectionPointLocal_2_r1 = Pixel_phase1::getIntersection(p1, p3, rho, det2_r1, intersection2_r1);
+	  std::vector<double> IntersectionPointLocal_2_r1 = Triplets_Fpix::getIntersection(p1, p3, rho, det2_r1, intersection2_r1);
           xl_ideal_2_r1 = IntersectionPointLocal_2_r1[0];
           yl_ideal_2_r1 = IntersectionPointLocal_2_r1[1];
           residual_x_2_r1= (xpx2_l_r1 - xl_ideal_2_r1)*1E4;
@@ -1331,7 +1331,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	if(n2_r2>0){
 	  std::vector<double> p2_r2 = {xPX2_r2, yPX2_r2, zPX2_r2};
 	  std::vector<double> intersection2_r2 = {};
-	  std::vector<double> IntersectionPointLocal_2_r2 = Pixel_phase1::getIntersection(p1, p3, rho, det2_r2, intersection2_r2);
+	  std::vector<double> IntersectionPointLocal_2_r2 = Triplets_Fpix::getIntersection(p1, p3, rho, det2_r2, intersection2_r2);
           xl_ideal_2_r2 = IntersectionPointLocal_2_r2[0];
           yl_ideal_2_r2 = IntersectionPointLocal_2_r2[1];
           residual_x_2_r2= (xpx2_l_r2 - xl_ideal_2_r2)*1E4;
@@ -1384,14 +1384,14 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	std::vector<double> intersection4 = {};
 	
 	// Create helix from two points and curvature, return the intersection point in local coordinates
-	std::vector<double> IntersectionPointLocal_2 = Pixel_phase1::getIntersection(p3, p4, rho, det2, intersection2); 
-	std::vector<double> IntersectionPointLocal_3 = Pixel_phase1::getIntersection(p2, p4, rho, det3, intersection3);
-	std::vector<double> IntersectionPointLocal_4 = Pixel_phase1::getIntersection(p2, p3, rho, det4, intersection4);
+	std::vector<double> IntersectionPointLocal_2 = Triplets_Fpix::getIntersection(p3, p4, rho, det2, intersection2); 
+	std::vector<double> IntersectionPointLocal_3 = Triplets_Fpix::getIntersection(p2, p4, rho, det3, intersection3);
+	std::vector<double> IntersectionPointLocal_4 = Triplets_Fpix::getIntersection(p2, p3, rho, det4, intersection4);
 
 	if(n3_r1>0){
 	  std::vector<double> p3_r1 = {xPX3_r1, yPX3_r1, zPX3_r1};
 	  std::vector<double> intersection3_r1 = {};	
-	  std::vector<double> IntersectionPointLocal_3_r1 = Pixel_phase1::getIntersection(p2, p4, rho, det3_r1, intersection3_r1);
+	  std::vector<double> IntersectionPointLocal_3_r1 = Triplets_Fpix::getIntersection(p2, p4, rho, det3_r1, intersection3_r1);
 	  xl_ideal_3_r1 = IntersectionPointLocal_3_r1[0];
 	  yl_ideal_3_r1 = IntersectionPointLocal_3_r1[1];
 	  residual_x_3_r1= (xpx3_l_r1 - xl_ideal_3_r1)*1E4;
@@ -1401,7 +1401,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	if(n4_r1>0){
 	  std::vector<double> p4_r1 = {xPX4_r1, yPX4_r1, zPX4_r1};
 	  std::vector<double> intersection4_r1 = {};
-	  std::vector<double> IntersectionPointLocal_4_r1 = Pixel_phase1::getIntersection(p2, p3, rho, det4_r1, intersection4_r1);
+	  std::vector<double> IntersectionPointLocal_4_r1 = Triplets_Fpix::getIntersection(p2, p3, rho, det4_r1, intersection4_r1);
 	  xl_ideal_4_r1 = IntersectionPointLocal_4_r1[0];
 	  yl_ideal_4_r1 = IntersectionPointLocal_4_r1[1];
 	  residual_x_4_r1= (xpx4_l_r1 - xl_ideal_4_r1)*1E4;
@@ -1412,7 +1412,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	if(n3_r2>0){
 	  std::vector<double> p3_r2 = {xPX3_r2, yPX3_r2, zPX3_r2};
 	  std::vector<double> intersection3_r2 = {};	
-	  std::vector<double> IntersectionPointLocal_3_r2 = Pixel_phase1::getIntersection(p2, p4, rho, det3_r2, intersection3_r2);
+	  std::vector<double> IntersectionPointLocal_3_r2 = Triplets_Fpix::getIntersection(p2, p4, rho, det3_r2, intersection3_r2);
 	  xl_ideal_3_r2 = IntersectionPointLocal_3_r2[0];
 	  yl_ideal_3_r2 = IntersectionPointLocal_3_r2[1];
 	  residual_x_3_r2= (xpx3_l_r2 - xl_ideal_3_r2)*1E4;
@@ -1422,7 +1422,7 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 	if(n4_r2>0){
 	  std::vector<double> p4_r2 = {xPX4_r2, yPX4_r2, zPX4_r2};
 	  std::vector<double> intersection4_r2 = {};
-	  std::vector<double> IntersectionPointLocal_4_r2 = Pixel_phase1::getIntersection(p2, p3, rho, det4_r2, intersection4_r2);
+	  std::vector<double> IntersectionPointLocal_4_r2 = Triplets_Fpix::getIntersection(p2, p3, rho, det4_r2, intersection4_r2);
 	  xl_ideal_4_r2 = IntersectionPointLocal_4_r2[0];
 	  yl_ideal_4_r2 = IntersectionPointLocal_4_r2[1];
 	  residual_x_4_r2= (xpx4_l_r2 - xl_ideal_4_r2)*1E4;
@@ -1501,12 +1501,12 @@ void Pixel_phase1::getResiduals(const edm::Event & iEvent, const edm::EventSetup
 //----------------------------------------------------------------------
 // method called just after ending the event loop:
 //
-void Pixel_phase1::endJob() {
+void Triplets_Fpix::endJob() {
   
-  std::cout << "end of job after " << myCountersPixel_phase1::neve << " events.\n";
+  std::cout << "end of job after " << myCountersTriplets_Fpix::neve << " events.\n";
   
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(Pixel_phase1);
+DEFINE_FWK_MODULE(Triplets_Fpix);
 

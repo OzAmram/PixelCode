@@ -1,6 +1,6 @@
 
-#ifndef PHASEIPIXELNTUPLIZER_H
-#define PHASEIPIXELNTUPLIZER_H
+#ifndef TRACKREFITRESID_H
+#define TRACKREFITRESID_H
 
 
 // CMSSW code
@@ -15,7 +15,6 @@
 #include "FWCore/Common/interface/TriggerNames.h"
 //#include "DataFormats/TrackReco/interface/Track.h"
 #include "Geometry/TrackerGeometryBuilder/interface/TrackerGeometry.h"
-#include "Geometry/TrackerGeometryBuilder/interface/PixelGeomDetUnit.h"
 #include "Geometry/TrackerNumberingBuilder/interface/GeometricDet.h"
 #include "Geometry/Records/interface/TrackerDigiGeometryRecord.h"
 #include "DataFormats/Common/interface/ConditionsInEdm.h"
@@ -27,6 +26,7 @@
 #include "DataFormats/SiPixelDetId/interface/PixelEndcapName.h"
 #include "DataFormats/SiPixelDetId/interface/PixelSubdetector.h"
 #include "DataFormats/SiStripDetId/interface/StripSubdetector.h"
+#include "DataFormats/SiStripDetId/interface/SiStripDetId.h"
 #include "SimDataFormats/TrackingHit/interface/PSimHit.h"
 #include "SimDataFormats/TrackingHit/interface/PSimHitContainer.h"
 #include "DataFormats/SiPixelCluster/interface/SiPixelCluster.h"
@@ -62,8 +62,7 @@
 //#include "DPGAnalysis-SiPixelTools/PhaseIPixelNtuplizer/interface/DataStructures_v6.h"
 
 
-// SiPixelCoordinates: new class for plotting Phase 0/1 Geometry
-#include "DQM/SiPixelPhase1Common/interface/SiPixelCoordinates.h"
+#include "DPGAnalysis-SiPixelTools/PixelTrees/plugins/SiPixelCoordinates.cc"
 
 // Helpers to save canvases
 //#include "DPGAnalysis-SiPixelTools/PhaseIPixelNtuplizer/interface/common_functions.h"

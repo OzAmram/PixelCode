@@ -18,6 +18,7 @@ process.load('Configuration.StandardSequences.Reconstruction_Data_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
+
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(10)
 )
@@ -25,7 +26,8 @@ process.maxEvents = cms.untracked.PSet(
 orbit_begin_array = [0]
 orbit_end_array = [1434229500]
 
-index = 0
+
+layer = 1
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -40,6 +42,7 @@ process.source = cms.Source("PoolSource",
 #'/store/data/Run2018D/DoubleMuon/RAW/v1/000/321/833/00000/8644BCBB-D8A9-E811-B640-FA163EDE417A.root'
 #'/store/data/Run2018D/DoubleMuon/RAW/v1/000/321/833/00000/B62DB1BB-D9A9-E811-BC1F-FA163E7C3F50.root'
 '/store/data/Run2018D/SingleMuon/RAW/v1/000/321/833/00000/9CD43785-D4A9-E811-893C-FA163EF8F660.root'
+#'/store/data/Commissioning2018/MinimumBias/RAW/v1/000/312/309/00000/9032B062-F52C-E811-A98B-FA163EBF57CC.root'
 
 ),
     secondaryFileNames = cms.untracked.vstring()
@@ -76,7 +79,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 #process.GlobalTag = GlobalTag(process.GlobalTag, '102X_dataRun2_Prompt_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_PromptLike_v7', '')
 #process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_23_14_42_31', '')
-process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+#process.GlobalTag = GlobalTag(process.GlobalTag, '103X_dataRun2_Prompt_Candidate_2018_10_26_20_13_12', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '105X_dataRun2_v6', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
@@ -84,13 +88,6 @@ process.L1Reco_step = cms.Path(process.L1Reco)
 process.reconstruction_step = cms.Path(process.reconstruction)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.RECOoutput_step = cms.EndPath(process.RECOoutput)
-
-# Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.endjob_step,process.RECOoutput_step)
-from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
-associatePatAlgosToolsTask(process)
-
-
 
 
 
@@ -101,8 +98,25 @@ associatePatAlgosToolsTask(process)
 # Insert resolution stuff here
 
 # Refitter
-process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
-process.TrackRefitter_step = cms.Path(process.MeasurementTrackerEvent*process.TrackRefitter)
+process.load("RecoTracker.FinalTrackSelectors.TrackerTrackHitFilter_cff")
+process.TrackerTrackHitFilter.src = 'generalTracks'
+if(layer == 1): process.TrackerTrackHitFilter.commands = cms.vstring("drop PXB","keep PXB 2","keep PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+if(layer == 2): process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","drop PXB 2","keep PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+if(layer == 3): process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","keep PXB 2","drop PXB 3","keep PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+
+#process.TrackerTrackHitFilter.commands = cms.vstring("keep PXB","keep PXB 2","keep PXB 3","drop PXB 4","keep PXE","keep TIB","keep TID","keep TOB","keep TEC")
+#Refit tracks after hit filter
+#You might want to customize the options, or use a different refitter
+import RecoTracker.TrackProducer.CTFFinalFitWithMaterial_cff
+process.trackFitter = RecoTracker.TrackProducer.CTFFinalFitWithMaterial_cff.ctfWithMaterialTracks.clone()
+process.trackFitter.src = 'TrackerTrackHitFilter'
+#process.load("RecoTracker.TrackProducer.TrackRefitters_cff")
+process.TrackRefitter_step = cms.Path( process.MeasurementTrackerEvent * process.TrackerTrackHitFilter * process.trackFitter * process.reconstruction) 
+
+#TURN ON CR FOR RECO
+
+#process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string('PixelCPEClusterRepair') 
+
 
 #------------------------------------------
 #  Define your Analyzer(s) here
@@ -111,29 +125,28 @@ process.TrackRefitter_step = cms.Path(process.MeasurementTrackerEvent*process.Tr
 #    trajectoryInput = cms.InputTag('TrackRefitter'))
 
 # BPix Resolution
-process.Layer1_Residuals = cms.EDAnalyzer('Resid',
+process.Refit_Residuals = cms.EDAnalyzer('Resid_filter',
         triggerSource = cms.InputTag('TriggerResults::HLT'),
         ttrhBuilder = cms.string('WithAngleAndTemplate'),
-        trajectoryInput = cms.InputTag('TrackRefitter'),
-        orbit_beginning = cms.int32(orbit_begin_array[index]),
-        orbit_end = cms.int32(orbit_end_array[index]),
+        trackInput = cms.InputTag('trackFitter'),
+        trackInputGeneral = cms.InputTag('generalTracks'),
+        dropLayer = cms.int32(layer)
 )
 
 # TFileService used for both BPix/FPix resolution
 process.TFileService = cms.Service('TFileService',
-    fileName = cms.string("Layer1_residuals_test.root"),
+    fileName = cms.string("Refit_residuals_test.root"),
 )
 
 # Paths
-process.Layer1_Residuals_step = cms.Path(process.Layer1_Residuals)
+process.Refit_Residuals_step = cms.Path(process.Refit_Residuals)
 
-# Schedule definition
 process.schedule = cms.Schedule(
     process.raw2digi_step,
     process.L1Reco_step,
     process.reconstruction_step,
     process.TrackRefitter_step,
-    process.Layer1_Residuals_step
+    process.Refit_Residuals_step
     )
 
 # end of insert to cmsDriver script

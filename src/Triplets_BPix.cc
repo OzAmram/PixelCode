@@ -120,12 +120,12 @@ namespace {
 
 } // namespace
 
-class Pixel : public edm::EDAnalyzer{
+class Triplets_BPix : public edm::EDAnalyzer{
 
     public:
-        explicit Pixel(const edm::ParameterSet& // ,edm::ConsumesCollector&&
+        explicit Triplets_BPix(const edm::ParameterSet& // ,edm::ConsumesCollector&&
                 );
-        ~Pixel();
+        ~Triplets_BPix();
 
     private:
         virtual void beginJob() ;
@@ -174,10 +174,10 @@ class Pixel : public edm::EDAnalyzer{
 //
 // constructor:
 //
-Pixel::Pixel(const edm::ParameterSet& iConfig// , edm::ConsumesCollector && ic
+Triplets_BPix::Triplets_BPix(const edm::ParameterSet& iConfig// , edm::ConsumesCollector && ic
         )
 {
-    std::cout << "Pixel constructed\n";
+    std::cout << "Triplets_BPix constructed\n";
     _triggerSrc = iConfig.getParameter<edm::InputTag>("triggerSource");
     _ttrhBuilder = iConfig.getParameter<std::string>("ttrhBuilder");
     singleParticleMC  = iConfig.getUntrackedParameter<bool>("singleParticleMC",false);
@@ -256,7 +256,7 @@ Pixel::Pixel(const edm::ParameterSet& iConfig// , edm::ConsumesCollector && ic
 //
 // destructor:
 //
-Pixel::~Pixel()
+Triplets_BPix::~Triplets_BPix()
 {
     // do anything here that needs to be done at desctruction time
     // (e.g. close files, deallocate resources etc.)
@@ -267,20 +267,20 @@ Pixel::~Pixel()
 // member functions:
 // method called once each job just before starting event loop
 //
-void Pixel::beginJob()
+void Triplets_BPix::beginJob()
 {
 }
 
 //----------------------------------------------------------------------
 // method called for each event:
 
-void Pixel::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
+void Triplets_BPix::beginRun(const edm::Run& iRun, const edm::EventSetup& iSetup)
 {
 
 
 }
 
-void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // , edm::ConsumesCollector && ic
+void Triplets_BPix::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // , edm::ConsumesCollector && ic
         ){
     if((int)iEvent.orbitNumber() >= (int)_OC_beginning && (int)iEvent.orbitNumber() <= (int)_OC_end ){
         using namespace std;
@@ -2090,11 +2090,11 @@ void Pixel::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup // ,
 //----------------------------------------------------------------------
 // method called just after ending the event loop:
 //
-void Pixel::endJob() {
+void Triplets_BPix::endJob() {
 
     std::cout << "end of job after " << myCounters::neve << " events.\n";
 
 }
 
 //define this as a plug-in
-DEFINE_FWK_MODULE(Pixel);
+DEFINE_FWK_MODULE(Triplets_BPix);

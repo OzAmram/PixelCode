@@ -1,5 +1,4 @@
-// CMS and user include files:
-#include "data_test/pixel/src/Resid_filter.h"
+#include "Resid_filter.h"
 
 Resid_filter::Resid_filter(const edm::ParameterSet& iConfig// , edm::ConsumesCollector && ic
         )
@@ -247,7 +246,8 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
                 }
                 else{
-                    printf("clust in track \n");
+                    //printf("clust in track \n");
+                    continue;
                 }
             }
             else if(Resid_filterHelpers::detidIsOnStrips(detId)) {
@@ -295,7 +295,8 @@ const reco::Track* Resid_filter::associateInputTrack(const reco::Track iTrack,co
 
                 }
                 else{
-                    printf("strip clust in track \n");
+                    //printf("strip clust in track \n");
+                    continue;
                 }
             }
             
@@ -378,7 +379,7 @@ void Resid_filter::checkAndSaveTrajMeasurementData
                 if(clust1a != nullptr){
                     float dist1= clusterPointDistanceSquared(detId, *clust, localTrkPosition, trajectoryParameters, false);
                     float dist2= clusterPointDistanceSquared(detId, *clust1a, localTrkPosition, trajectoryParameters, false);
-                    printf("Clust 1 is clust 1a: %d \n", abs(dist1 -dist2) < 1E-6);
+                    //printf("Clust 1 is clust 1a: %d \n", abs(dist1 -dist2) < 1E-6);
                 }
             }
         //float currentMinValueSquared = clusterPointDistanceSquared(detId, *clust_1D, localPosition, trajectoryParameters, false);
