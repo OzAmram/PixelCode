@@ -66,10 +66,12 @@ process.TrackRefitter.NavigationSchool = ""
 # # -- RecHit production
 process.load("RecoLocalTracker.SiPixelRecHits.SiPixelRecHits_cfi")
 process.load("RecoTracker.TransientTrackingRecHit.TransientTrackingRecHitBuilder_cfi")
+
 #use ClusterRepairCPE
 process.TTRHBuilderAngleAndTemplate.PixelCPE = cms.string("PixelCPEClusterRepair")
 process.load("RecoLocalTracker.SiPixelRecHits.PixelCPEClusterRepair_cfi")
-#process.templates2.RunDamagedCluster = True
+process.templates2.RunDamagedClusters = cms.bool(False )
+process.templates2.Recommend2D = cms.vstring("PXB 1", "PXB 2", "PXB 3", "PXB 4")
 
 
 process.PixelTree = cms.EDAnalyzer(
