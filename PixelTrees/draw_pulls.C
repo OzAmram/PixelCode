@@ -27,13 +27,21 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
 
     //read event data
     const int SIZE = 20000;
+    const int TKSIZE = 10000;
     Long64_t size  =  t1->GetEntries();
-    Float_t TkEta[10000];
+    Int_t TkN, TkNHits[TKSIZE];
+    Float_t TkEta[TKSIZE], TkBeta[TKSIZE][20];
     Float_t ClRhLx[SIZE], ClRhLy[SIZE],  ClRhLxE[SIZE], ClRhLyE[SIZE],  ClSimTrEta[SIZE][10], ClSimHitLx[SIZE][10], ClSimHitLy[SIZE][10];
-    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE];
+    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE], TkClI[SIZE][20], TkClN[SIZE];
 
-    t1->SetBranchAddress("TkEta", &TkEta);
+
     t1->SetBranchAddress("ClN", &ClN);
+    t1->SetBranchAddress("TkN", &TkN);
+    t1->SetBranchAddress("TkNHits", &TkNHits);
+    t1->SetBranchAddress("TkClN", &TkClN);
+    t1->SetBranchAddress("TkClI", &TkClI);
+    t1->SetBranchAddress("TkEta", &TkEta);
+    t1->SetBranchAddress("TkBeta", &TkBeta);
     t1->SetBranchAddress("ClSimHitN", &ClSimHitN);
     t1->SetBranchAddress("ClType", &ClType);
     t1->SetBranchAddress("ClRhHasBadPixels", &ClRhHasBadPix);
@@ -45,40 +53,49 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     t1->SetBranchAddress("ClSimTrEta", &ClSimTrEta);
     t1->SetBranchAddress("ClSimHitLx", &ClSimHitLx);
     t1->SetBranchAddress("ClSimHitLy", &ClSimHitLy);
+
     for(int i =0; i< size; i++){
         t1->GetEntry(i);
         if(ClN > SIZE) printf("WARNING: Number of clusters (%i) greater than array size (%i), memory issues likely!!! \n \n \n", ClN, SIZE);
-        for(int j=0; j<ClN; j++){
-            if(ClType[j]==1){ // on a track
-                //std::cout << "tk eta " << fabs(TkEta[0]) << " sim eta " << fabs(ClSimTrEta[j][0]) << std::endl;
-                float dx(9999), dy(9999), pullx(9999), pully(9999);
-                int iKx(0), iKy(0);
-                for(int k=0; k<ClSimHitN[j]; k++){
-                    if(fabs(ClSimHitLx[j][k] - ClRhLx[j]) < fabs(dx)){ 
-                        dx = ClRhLx[j] - ClSimHitLx[j][k];
-                        pullx =  dx/ClRhLxE[j];
-                        iKx = k;
+        for(int tkI = 0; tkI < TkN; tkI++){
+
+            //if(TKNHits[tkI] <5) continue;
+            for(int iClus=0; iClus < TkClN[tkI]; iClus++){
+                int j = TkClI[tkI][iClus];
+                float beta = TkBeta[tkI][iClus];
+
+                if(ClType[j]==1){ // on a track
+                    float dx(9999), dy(9999), pullx(9999), pully(9999);
+                    int iKx(0), iKy(0), q(0);
+                    for(int k=0; k<ClSimHitN[j]; k++){
+                        if(fabs(ClSimHitLx[j][k] - ClRhLx[j]) < fabs(dx)){ 
+                            dx = ClRhLx[j] - ClSimHitLx[j][k];
+                            pullx =  dx/ClRhLxE[j];
+                            iKx = k;
+                        }
+                        if(fabs(ClSimHitLy[j][k] - ClRhLy[j]) < fabs(dy)){ 
+                            dy =  ClRhLy[j]  - ClSimHitLy[j][k];
+                            pully =  dy/ClRhLyE[j];
+                            iKy = k;
+                        }
                     }
-                    if(fabs(ClSimHitLy[j][k] - ClRhLy[j]) < fabs(dy)){ 
-                        dy =  ClRhLy[j]  - ClSimHitLy[j][k];
-                        pully =  dy/ClRhLyE[j];
-                        iKy = k;
+                    bool fill = (dx<9999) && (dy<9999);
+                    if(on_edge) fill = fill && ClRhIsOnEdge[j];
+                    if(bad_pix) fill = fill && ClRhHasBadPix[j];
+                    if(fill){
+                        //mult by 10000 to convert to microns
+                        float to_microns = 1e4;
+                        h_x->Fill(to_microns * dx);
+                        h_y->Fill(to_microns * dy);
+                        if(h_pullx != nullptr) h_pullx->Fill(pullx);
+                        if(h_pully != nullptr) h_pully->Fill(pully);
                     }
-                }
-                bool fill = (dx<9999) && (dy<9999);
-                if(on_edge) fill = fill && ClRhIsOnEdge[j];
-                if(bad_pix) fill = fill && ClRhHasBadPix[j];
-                if(fill){
-                    //mult by 10000 to convert to microns
-                    float to_microns = 1e4;
-                    h_x->Fill(to_microns * dx);
-                    h_y->Fill(to_microns * dy);
-                    if(h_pullx != nullptr) h_pullx->Fill(pullx);
-                    if(h_pully != nullptr) h_pully->Fill(pully);
+
                 }
             }
         }
     }
+
     printf("printing means and std devs for %s (N = %.0f) \n", iFile.c_str(), h_x->Integral());
     if(on_edge) printf("Edge Clusters: \n");
     if(bad_pix) printf("BadPix Clusters: \n");
@@ -126,7 +143,7 @@ void draw_pulls(){
     h_pully->SetLineColor(kBlack);
 
 
-    string f_name("PixelTree_1_10.root");
+    string f_name("root://cmseos.fnal.gov//store/user/rkowalsk/PixelTree_DamageclusterTrue.root");
     //All clusters
 
     bool use_edge = false;
@@ -138,26 +155,26 @@ void draw_pulls(){
     h_x->Draw("pe");
     h_x->Fit("gaus");
     h_x->GetFunction("gaus")->SetLineColor(kBlue);
-    c1->SaveAs("all_residx.png");
+    c1->SaveAs("all_residx_True_BL0.png");
 
     TCanvas *c2 = new TCanvas("c2", "", 0,0 , 800, 800);
     h_y->Draw("pe");
     h_y->Fit("gaus");
     h_y->GetFunction("gaus")->SetLineColor(kBlue);
-    c2->SaveAs("all_residy.png");
+    c2->SaveAs("all_residy_True_BL0.png");
 
     TCanvas *c3 = new TCanvas("c3", "", 0, 0, 800, 800);
     h_pullx->Draw("pe");
     h_pullx->Fit("gaus");
     h_pullx->GetFunction("gaus")->SetLineColor(kBlue);
-    c3->SaveAs("all_pullx.png");
+    c3->SaveAs("all_pullx_True_BL0.png");
 
     TCanvas *c4 = new TCanvas("c4", "", 0,0 , 800, 800);
     h_pully->Draw("pe");
     h_pully->Fit("gaus");
     h_pully->GetFunction("gaus")->SetLineColor(kBlue);
-    c4->SaveAs("all_pully.png");
-    
+    c4->SaveAs("all_pully_True_BL0.png");
+
     h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset();
     //Edge clusters
 
@@ -169,25 +186,25 @@ void draw_pulls(){
     h_x->Draw("pe");
     h_x->Fit("gaus");
     h_x->GetFunction("gaus")->SetLineColor(kBlue);
-    c1e->SaveAs("edge_residx.png");
+    c1e->SaveAs("edge_residx_True_BL0.png");
 
     TCanvas *c2e = new TCanvas("c2", "", 0,0 , 800, 800);
     h_y->Draw("pe");
     h_y->Fit("gaus");
     h_y->GetFunction("gaus")->SetLineColor(kBlue);
-    c2e->SaveAs("edge_residy.png");
+    c2e->SaveAs("edge_residy_True_BL0.png");
 
     TCanvas *c3e = new TCanvas("c3", "", 0, 0, 800, 800);
     h_pullx->Draw("pe");
     h_pullx->Fit("gaus");
     h_pullx->GetFunction("gaus")->SetLineColor(kBlue);
-    c3e->SaveAs("edge_pullx.png");
+    c3e->SaveAs("edge_pullx_True_BL0.png");
 
     TCanvas *c4e = new TCanvas("c4", "", 0,0 , 800, 800);
     h_pully->Draw("pe");
     h_pully->Fit("gaus");
     h_pully->GetFunction("gaus")->SetLineColor(kBlue);
-    c4e->SaveAs("edge_pully.png");
+    c4e->SaveAs("edge_pully_True_BL0.png");
 
 
     h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset();
@@ -201,25 +218,25 @@ void draw_pulls(){
     h_x->Draw("pe");
     h_x->Fit("gaus");
     h_x->GetFunction("gaus")->SetLineColor(kBlue);
-    c1b->SaveAs("badpix_residx.png");
+    c1b->SaveAs("badpix_residx_True_BL0.png");
 
     TCanvas *c2b = new TCanvas("c2", "", 0,0 , 800, 800);
     h_y->Draw("pe");
     h_y->Fit("gaus");
     h_y->GetFunction("gaus")->SetLineColor(kBlue);
-    c2b->SaveAs("badpix_residy.png");
+    c2b->SaveAs("badpix_residy_True_BL0.png");
 
     TCanvas *c3b = new TCanvas("c3", "", 0, 0, 800, 800);
     h_pullx->Draw("pe");
     h_pullx->Fit("gaus");
     h_pullx->GetFunction("gaus")->SetLineColor(kBlue);
-    c3b->SaveAs("badpix_pullx.png");
+    c3b->SaveAs("badpix_pullx_True_BL0.png");
 
     TCanvas *c4b = new TCanvas("c4", "", 0,0 , 800, 800);
     h_pully->Draw("pe");
     h_pully->Fit("gaus");
     h_pully->GetFunction("gaus")->SetLineColor(kBlue);
-    c4b->SaveAs("badpix_pully.png");
+    c4b->SaveAs("badpix_pully_True_BL0.png");
 
     return;
 }
