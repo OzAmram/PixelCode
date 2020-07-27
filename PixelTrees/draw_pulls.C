@@ -32,7 +32,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     Int_t TkN, TkNHits[TKSIZE];
     Float_t TkEta[TKSIZE], TkBeta[TKSIZE][20];
     Float_t ClRhLx[SIZE], ClRhLy[SIZE],  ClRhLxE[SIZE], ClRhLyE[SIZE],  ClSimTrEta[SIZE][10], ClSimHitLx[SIZE][10], ClSimHitLy[SIZE][10];
-    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE], TkClI[SIZE][20], TkClN[SIZE];
+    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE], TkClI[SIZE][20], TkClN[SIZE], ClLayer[SIZE];
 
 
     t1->SetBranchAddress("ClN", &ClN);
@@ -44,6 +44,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     t1->SetBranchAddress("TkBeta", &TkBeta);
     t1->SetBranchAddress("ClSimHitN", &ClSimHitN);
     t1->SetBranchAddress("ClType", &ClType);
+    t1->SetBranchAddress("ClLayer", &ClLayer);
     t1->SetBranchAddress("ClRhHasBadPixels", &ClRhHasBadPix);
     t1->SetBranchAddress("ClRhIsOnEdge", &ClRhIsOnEdge);
     t1->SetBranchAddress("ClRhLx", &ClRhLx);
@@ -79,7 +80,9 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
                             iKy = k;
                         }
                     }
+                    
                     bool fill = (dx<9999) && (dy<9999);
+                    //fill = fill && ClLayer[j] == 1;
                     if(on_edge) fill = fill && ClRhIsOnEdge[j];
                     if(bad_pix) fill = fill && ClRhHasBadPix[j];
                     if(fill){
@@ -143,7 +146,8 @@ void draw_pulls(){
     h_pully->SetLineColor(kBlack);
 
 
-    string f_name("root://cmseos.fnal.gov//store/user/rkowalsk/PixelTree_DamageclusterTrue.root");
+    //string f_name("PixelTree_CR_Off_beckyFile.root");
+    string f_name("PixelTree_CR_on_beckyFile.root");
     //All clusters
 
     bool use_edge = false;
