@@ -58,15 +58,14 @@ def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir, doFit = True, draw_opt
         pFunc.SetParameter( 4, 0.); pFunc.SetParName( 4, "bkg");
         iTmp.Fit(pFunc, "RN" ,"ep");
         pFunc.SetNpx(500);
-        pFunc.SetLineColor(ROOT.kGreen);
+        pFunc.SetLineColor(ROOT.kBlue);
         pChi2 = pFunc.GetChisquare()/(iTmp.GetNbinsX()-5);
         pFunc.SetLineWidth(3);
         lmean = pFunc.GetParameter(0)
         lmeanErr = pFunc.GetParError(0)
         lwidth = pFunc.GetParameter(1)
         lwidthErr = pFunc.GetParError(1)
-    iTmp.SetMarkerStyle(21);
-    iTmp.SetMarkerSize(0.8);
+    iTmp.SetMarkerStyle(20);
     iTmp.SetMarkerColor(kBlack);
     iTmp.SetLineColor(kBlack);
     iTmp.SetTitle("");
@@ -76,7 +75,7 @@ def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir, doFit = True, draw_opt
     c =ROOT.TCanvas("cfit1d%s"%(iTmp.GetName()),"",800,800)
     ROOT.TGaxis.SetMaxDigits(3);
     iTmp.Draw(draw_opt);
-    if(doFit): pFunc.Draw("ep same");
+    if(doFit): pFunc.Draw("same");
     pLeg.Draw()
     if(doFit):
         tag1 = ROOT.TLatex(0.70,0.80,"#mu_{r}: %.2f +/- %.2f "%(pFunc.GetParameter(0),pFunc.GetParError(0)))

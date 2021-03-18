@@ -21,7 +21,7 @@
 #include "Math/Functor.h"
 
 
-void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr, TH1F *h_pully = nullptr, bool on_edge = false, bool bad_pix = false){
+void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr, TH1F *h_pully = nullptr, TH1F *h_nSimHits = nullptr, bool on_edge = false, bool bad_pix = false){
     TFile *f_data = TFile::Open(iFile.c_str());
     TTree *t1 = (TTree *)f_data->Get("pixelTree");
 
@@ -32,7 +32,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     Int_t TkN, TkNHits[TKSIZE];
     Float_t TkEta[TKSIZE], TkBeta[TKSIZE][20];
     Float_t ClRhLx[SIZE], ClRhLy[SIZE],  ClRhLxE[SIZE], ClRhLyE[SIZE],  ClSimTrEta[SIZE][10], ClSimHitLx[SIZE][10], ClSimHitLy[SIZE][10];
-    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE], TkClI[SIZE][20], TkClN[SIZE], ClLayer[SIZE];
+    Int_t ClRhIsOnEdge[SIZE], ClN, ClSimHitN[SIZE], ClType[SIZE], ClRhHasBadPix[SIZE], TkClI[SIZE][20], TkClN[SIZE], ClLayer[SIZE], ClDisk[SIZE], ClSimHitPRC[SIZE][10];
 
 
     t1->SetBranchAddress("ClN", &ClN);
@@ -45,6 +45,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     t1->SetBranchAddress("ClSimHitN", &ClSimHitN);
     t1->SetBranchAddress("ClType", &ClType);
     t1->SetBranchAddress("ClLayer", &ClLayer);
+    t1->SetBranchAddress("ClDisk", &ClDisk);
     t1->SetBranchAddress("ClRhHasBadPixels", &ClRhHasBadPix);
     t1->SetBranchAddress("ClRhIsOnEdge", &ClRhIsOnEdge);
     t1->SetBranchAddress("ClRhLx", &ClRhLx);
@@ -52,6 +53,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
     t1->SetBranchAddress("ClRhLxE", &ClRhLxE);
     t1->SetBranchAddress("ClRhLyE", &ClRhLyE);
     t1->SetBranchAddress("ClSimTrEta", &ClSimTrEta);
+    t1->SetBranchAddress("ClSimHitPRC", &ClSimHitPRC);
     t1->SetBranchAddress("ClSimHitLx", &ClSimHitLx);
     t1->SetBranchAddress("ClSimHitLy", &ClSimHitLy);
 
@@ -68,7 +70,10 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
                 if(ClType[j]==1){ // on a track
                     float dx(9999), dy(9999), pullx(9999), pully(9999);
                     int iKx(0), iKy(0), q(0);
-                    for(int k=0; k<ClSimHitN[j]; k++){
+                    int nSimHits = 0;
+
+                    for(int k=0; k<=ClSimHitN[j]; k++){
+                        if(ClSimHitPRC[j][k] == 0) nSimHits++;
                         if(fabs(ClSimHitLx[j][k] - ClRhLx[j]) < fabs(dx)){ 
                             dx = ClRhLx[j] - ClSimHitLx[j][k];
                             pullx =  dx/ClRhLxE[j];
@@ -83,6 +88,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
                     
                     bool fill = (dx<9999) && (dy<9999);
                     //fill = fill && ClLayer[j] == 1;
+                    //fill = fill && ClDisk[j] > -10;
                     if(on_edge) fill = fill && ClRhIsOnEdge[j];
                     if(bad_pix) fill = fill && ClRhHasBadPix[j];
                     if(fill){
@@ -92,6 +98,7 @@ void fill_pulls(std::string iFile, TH1F *h_x, TH1F *h_y, TH1F *h_pullx = nullptr
                         h_y->Fill(to_microns * dy);
                         if(h_pullx != nullptr) h_pullx->Fill(pullx);
                         if(h_pully != nullptr) h_pully->Fill(pully);
+                        if(h_nSimHits != nullptr) h_nSimHits->Fill(nSimHits);
                     }
 
                 }
@@ -128,6 +135,8 @@ void draw_pulls(){
     TH1F *h_y = new TH1F("h_y", "Y position residual; #Deltay (#mum)" , nBins, -range, range);
     TH1F *h_pullx = new TH1F("h_pullx", "X Pull; X Pull" , nBins, -3, 3);
     TH1F *h_pully = new TH1F("h_pully", "Y Pull; Y Pull" , nBins, -3, 3);
+    int n_simhit_bins = 8;
+    TH1F *h_nSimHits = new TH1F("h_nSimHits", "N Sim Hit; # Primary Sim Hits", n_simhit_bins, -0.5, n_simhit_bins - 0.5);
 
     h_x->SetMarkerColor(kBlack);
     h_x->SetMarkerStyle(20);
@@ -146,13 +155,19 @@ void draw_pulls(){
     h_pully->SetLineColor(kBlack);
 
 
-    //string f_name("PixelTree_CR_Off_beckyFile.root");
-    string f_name("PixelTree_CR_on_beckyFile.root");
+    //string f_name("../PixelTree_CR_after.root");
+    string f_name("../PixelTree_cluster_healing_generic.root");
+    //string f_name("../PixelTree_template.root");
     //All clusters
 
     bool use_edge = false;
     bool use_badpix = false;
-    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, use_edge, use_badpix);
+    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, h_nSimHits, use_edge, use_badpix);
+
+    float n_all_hits = h_x->Integral();
+
+    float frac_multi_sim_hit = h_nSimHits->Integral(3,n_simhit_bins)/h_nSimHits->Integral();
+    printf("Fraction of multi sim hits is %.3f \n", frac_multi_sim_hit);
 
 
     TCanvas *c1 = new TCanvas("c1", "", 0, 0, 800, 800);
@@ -179,11 +194,25 @@ void draw_pulls(){
     h_pully->GetFunction("gaus")->SetLineColor(kBlue);
     c4->SaveAs("all_pully_True_BL0.png");
 
-    h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset();
+
+    TCanvas *c5 = new TCanvas("c5", "", 0,0 , 800, 800);
+    h_nSimHits->Draw("hist");
+    c5->SaveAs("all_nSimHits.png");
+
+
+    h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset(); h_nSimHits->Reset();
     //Edge clusters
 
     use_edge = true;
-    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, use_edge, use_badpix);
+    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, h_nSimHits, use_edge, use_badpix);
+
+    float n_edge_hits = h_x->Integral();
+    float frac_edge = n_edge_hits/n_all_hits;
+
+    frac_multi_sim_hit = h_nSimHits->Integral(3,n_simhit_bins)/h_nSimHits->Integral();
+
+    printf("Fraction of edge hits is %.3f \n", frac_edge);
+    printf("Fraction of multi sim hits is %.3f \n", frac_multi_sim_hit);
 
 
     TCanvas *c1e = new TCanvas("c1", "", 0, 0, 800, 800);
@@ -211,12 +240,24 @@ void draw_pulls(){
     c4e->SaveAs("edge_pully_True_BL0.png");
 
 
-    h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset();
+    TCanvas *c5e = new TCanvas("c5", "", 0,0 , 800, 800);
+    h_nSimHits->Draw("hist");
+    c5e->SaveAs("edge_nSimHits.png");
+
+
+    h_x->Reset(); h_y->Reset(); h_pullx->Reset(); h_pully->Reset(); h_nSimHits->Reset();
+
     //BadPix clusters
     use_edge = false;
     use_badpix = true;
-    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, use_edge, use_badpix);
+    fill_pulls(f_name, h_x, h_y, h_pullx, h_pully, h_nSimHits, use_edge, use_badpix);
 
+    float n_bad_hits = h_x->Integral();
+    float frac_bad = n_bad_hits/n_all_hits;
+    frac_multi_sim_hit = h_nSimHits->Integral(3,n_simhit_bins)/h_nSimHits->Integral();
+
+    printf("Fraction of bad hits is %.3f \n", frac_bad);
+    printf("Fraction of multi sim hits is %.3f \n", frac_multi_sim_hit);
 
     TCanvas *c1b = new TCanvas("c1", "", 0, 0, 800, 800);
     h_x->Draw("pe");
@@ -241,6 +282,11 @@ void draw_pulls(){
     h_pully->Fit("gaus");
     h_pully->GetFunction("gaus")->SetLineColor(kBlue);
     c4b->SaveAs("badpix_pully_True_BL0.png");
+
+
+    TCanvas *c5b = new TCanvas("c5", "", 0,0 , 800, 800);
+    h_nSimHits->Draw("hist");
+    c5b->SaveAs("badpix_nSimHits.png");
 
     return;
 }

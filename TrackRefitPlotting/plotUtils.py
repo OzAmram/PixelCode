@@ -81,7 +81,7 @@ def output1DGauss(h,iLegend,iColor,iStyle,iName,iName2,iOdir):
     tag9.SetNDC(); tag9.SetTextFont(42); tag9.SetTextSize(0.02); tag9.SetTextColor(1);
     h.SetFillColor(iColor)
     h.Draw("ep same")
-    fitRes.SetLineColor(ROOT.kGreen);
+    fitRes.SetLineColor(ROOT.kBlue);
     fitRes.SetLineWidth(2)
     fitRes.Draw("same")
     tag3.Draw()
@@ -118,15 +118,16 @@ def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir,iMean,iWidth):
 
     iTmp.Fit(pFunc, "RN" ,"ep");
     pFunc.SetNpx(500);
-    pFunc.SetLineColor(ROOT.kGreen);
+    pFunc.SetLineColor(ROOT.kBlue);
     pChi2 = pFunc.GetChisquare()/(iTmp.GetNbinsX()-5);
     pFunc.SetLineWidth(3);
     lmean = pFunc.GetParameter(0)
     lmeanErr = pFunc.GetParError(0)
     lwidth = pFunc.GetParameter(1)
     lwidthErr = pFunc.GetParError(1)
-    iTmp.SetMarkerStyle(21);
-    iTmp.SetMarkerSize(0.8);
+    iTmp.SetLineColor(kBlack);
+    iTmp.SetMarkerStyle(20);
+    iTmp.SetMarkerColor(kBlack);
     iTmp.SetTitle("");
 
     pLeg.AddEntry(iTmp,iLegend,"p");
