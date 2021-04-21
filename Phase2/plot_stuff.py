@@ -48,26 +48,30 @@ if __name__ == "__main__":
     pTree = fin.Get("ReadLocalMeasurement/PixelNtupleOnTrack")
     #pTree.Print()
     i = 0
+
+    resid_max = 200
+    pull_max = 5
     
-    outDir = 'T25_100events'
+    outDir = 'T23_100events_new'
     fpix_cut = "(subid == 2)" #&& trkPt > 5."
-    bpix_cut = "(subid == 1) && layer == 1" #&& trkPt > 5."
+    bpix_cut = "(subid == 1) && layer == 1 && spready >= 10" #&& trkPt > 5."
     #bpix_cut = "(subid == 1) && (layer == 2 || layer == 3 || layer == 4)" #&& trkPt > 5."
+    logy = False
 
     os.system("mkdir %s" % outDir)
 
     
-    fpix_resx = getHist(pTree, "1e4*(x-hx)", "fpix_dx", fpix_cut, binLow = -200, binHigh = 200)
-    fpix_resy = getHist(pTree, "1e4*(y-hy)", "fpix_dy", fpix_cut, binLow = -200, binHigh = 200)
+    fpix_resx = getHist(pTree, "1e4*(x-hx)", "fpix_dx", fpix_cut, binLow = -resid_max, binHigh = resid_max)
+    fpix_resy = getHist(pTree, "1e4*(y-hy)", "fpix_dy", fpix_cut, binLow = -resid_max, binHigh = resid_max)
 
-    bpix_resx = getHist(pTree, "1e4*(x-hx)", "bpix_dx", bpix_cut, binLow = -200, binHigh = 200)
-    bpix_resy = getHist(pTree, "1e4*(y-hy)", "bpix_dy", bpix_cut, binLow = -200, binHigh = 200)
+    bpix_resx = getHist(pTree, "1e4*(x-hx)", "bpix_dx", bpix_cut, binLow = -resid_max, binHigh = resid_max)
+    bpix_resy = getHist(pTree, "1e4*(y-hy)", "bpix_dy", bpix_cut, binLow = -resid_max, binHigh = resid_max)
 
-    fpix_pullx = getHist(pTree, "(x-hx)/TMath::Sqrt(xx)", "fpix_pullx", fpix_cut, binLow=-5, binHigh=5)
-    fpix_pully = getHist(pTree, "(y-hy)/TMath::Sqrt(yy)", "fpix_pully", fpix_cut, binLow=-5, binHigh=5)
+    fpix_pullx = getHist(pTree, "(x-hx)/TMath::Sqrt(xx)", "fpix_pullx", fpix_cut, binLow=-pull_max, binHigh=pull_max)
+    fpix_pully = getHist(pTree, "(y-hy)/TMath::Sqrt(yy)", "fpix_pully", fpix_cut, binLow=-pull_max, binHigh=pull_max)
 
-    bpix_pullx = getHist(pTree, "(x-hx)/TMath::Sqrt(xx)", "bpix_pullx", bpix_cut, binLow=-5, binHigh=5)
-    bpix_pully = getHist(pTree, "(y-hy)/TMath::Sqrt(yy)", "bpix_pully", bpix_cut, binLow=-5, binHigh=5)
+    bpix_pullx = getHist(pTree, "(x-hx)/TMath::Sqrt(xx)", "bpix_pullx", bpix_cut, binLow=-pull_max, binHigh=pull_max)
+    bpix_pully = getHist(pTree, "(y-hy)/TMath::Sqrt(yy)", "bpix_pully", bpix_cut, binLow=-pull_max, binHigh=pull_max)
 
     fpix_errx = getHist(pTree, "1e4 * TMath::Sqrt(xx)", "fpix_errx", fpix_cut, binLow=0., binHigh = 100.)
     fpix_erry = getHist(pTree, "1e4 * TMath::Sqrt(yy)", "fpix_erry", fpix_cut, binLow=0., binHigh = 100.)
@@ -118,10 +122,11 @@ if __name__ == "__main__":
     lColor = kBlack
     lTag2 = ''
 
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(fpix_resx,label,lColor,lstyle,"FPix",lTag2,outDir)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(fpix_resy,label,lColor,lstyle,"FPix",lTag2,outDir)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(bpix_resx,label,lColor,lstyle,"BPix",lTag2,outDir)
-    lmean,lmeanerr,lsigma,lsigmaerr = make1D(bpix_resy,label,lColor,lstyle,"BPix",lTag2,outDir)
+
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(fpix_resx,label,lColor,lstyle,"FPix",lTag2,outDir, logy=logy)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(fpix_resy,label,lColor,lstyle,"FPix",lTag2,outDir, logy=logy)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(bpix_resx,label,lColor,lstyle,"BPix",lTag2,outDir, logy=logy)
+    lmean,lmeanerr,lsigma,lsigmaerr = make1D(bpix_resy,label,lColor,lstyle,"BPix",lTag2,outDir, logy=logy)
 
 
     lmean,lmeanerr,lsigma,lsigmaerr = make1D(fpix_pullx,label,lColor,lstyle,"FPix",lTag2,outDir)

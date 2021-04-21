@@ -33,7 +33,7 @@ def studentT(x, p):
     return pk + p[4];
 
 
-def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir, doFit = True, draw_opt = "ep same"):
+def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir, doFit = True, draw_opt = "ep same", logy = False):
     #print iTmp.GetName()
     print "Integral of tree %s is %.0f " % (iTmp.GetName(), iTmp.Integral())
     pLeg = ROOT.TLegend(0.65,0.83,0.85,0.88)
@@ -70,9 +70,12 @@ def make1D(iTmp,iLegend,iColor,iStyle,iName,iName2,iOdir, doFit = True, draw_opt
     iTmp.SetLineColor(kBlack);
     iTmp.SetTitle("");
 
+
     pLeg.AddEntry(iTmp,iLegend,"p");
 
     c =ROOT.TCanvas("cfit1d%s"%(iTmp.GetName()),"",800,800)
+
+    if(logy): c.SetLogy()
     ROOT.TGaxis.SetMaxDigits(3);
     iTmp.Draw(draw_opt);
     if(doFit): pFunc.Draw("same");
